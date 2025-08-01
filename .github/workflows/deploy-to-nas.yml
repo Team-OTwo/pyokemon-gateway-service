@@ -24,8 +24,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -x test
 
-      # JAR 파일로 직접 배포하는 방식으로 변경
-      - name: Deploy JAR to Synology NAS
+      - name: Deploy to Synology NAS
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.NAS_HOST }}
@@ -36,88 +35,6 @@ jobs:
           target: "/volume1/docker/pyokemon/gateway-service"
           strip_components: 2
 
-      # 서비스 컨트롤 스크립트 업로드
-      - name: Create Service Script
-        run: |
-          cat > service.sh << 'EOF'
-          #!/bin/bash
-          SERVICE_NAME="gateway-service"
-          JAR_PATH="/volume1/docker/pyokemon/gateway-service/gateway-service-0.0.1.jar"
-          LOG_FILE="/volume1/docker/pyokemon/gateway-service/app.log"
-          PID_FILE="/volume1/docker/pyokemon/gateway-service/app.pid"
-          
-          start_service() {
-            if [ -f "$PID_FILE" ] && ps -p $(cat "$PID_FILE") > /dev/null; then
-              echo "서비스가 이미 실행 중입니다."
-              return 1
-            fi
-            
-            echo "서비스 시작 중..."
-            nohup java -jar "$JAR_PATH" > "$LOG_FILE" 2>&1 &
-            echo $! > "$PID_FILE"
-            echo "서비스가 시작되었습니다. (PID: $(cat $PID_FILE))"
-          }
-          
-          stop_service() {
-            if [ ! -f "$PID_FILE" ]; then
-              echo "PID 파일을 찾을 수 없습니다."
-              return 1
-            fi
-            
-            PID=$(cat "$PID_FILE")
-            if ps -p $PID > /dev/null; then
-              echo "서비스 중지 중... (PID: $PID)"
-              kill $PID
-              rm "$PID_FILE"
-              echo "서비스가 중지되었습니다."
-            else
-              echo "서비스가 실행 중이 아닙니다."
-              rm "$PID_FILE"
-            fi
-          }
-          
-          status_service() {
-            if [ -f "$PID_FILE" ] && ps -p $(cat "$PID_FILE") > /dev/null; then
-              echo "서비스가 실행 중입니다. (PID: $(cat $PID_FILE))"
-            else
-              echo "서비스가 실행 중이 아닙니다."
-            fi
-          }
-          
-          case "$1" in
-            start)
-              start_service
-              ;;
-            stop)
-              stop_service
-              ;;
-            restart)
-              stop_service
-              sleep 5
-              start_service
-              ;;
-            status)
-              status_service
-              ;;
-            *)
-              echo "사용법: $0 {start|stop|restart|status}"
-              exit 1
-          esac
-          exit 0
-          EOF
-          
-          chmod +x service.sh
-
-      - name: Deploy Service Script
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.NAS_HOST }}
-          username: ${{ secrets.NAS_USER }}
-          port: ${{ secrets.NAS_SSH_PORT }}
-          key: ${{ secrets.NAS_SSH_PRIVATE_KEY }}
-          source: "service.sh"
-          target: "/volume1/docker/pyokemon/gateway-service"
-
       - name: Restart Service
         uses: appleboy/ssh-action@master
         with:
@@ -126,19 +43,10 @@ jobs:
           port: ${{ secrets.NAS_SSH_PORT }}
           key: ${{ secrets.NAS_SSH_PRIVATE_KEY }}
           script: |
-            cd /volume1/docker/pyokemon/gateway-service
-            chmod +x service.sh
-            
-            echo "서비스 상태 확인"
-            ./service.sh status || echo "상태 확인 실패"
-            
-            echo "서비스 재시작"
-            ./service.sh restart
-            
-            echo "서비스 상태 재확인"
-            ./service.sh status
-            
-            echo "로그 확인"
-            tail -n 20 app.log || echo "로그 파일을 찾을 수 없습니다."
-            
+            cd ${{ secrets.DEPLOY_PATH }}
+            if ps -ef | grep "java.*gateway-service" | grep -v grep > /dev/null; then
+              ps -ef | grep "java.*gateway-service" | grep -v grep | awk '{print $2}' | xargs kill
+              sleep 5
+            fi
+            nohup java -jar gateway-service-0.0.1.jar > app.log 2>&1 &
             echo "배포 완료"
