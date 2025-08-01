@@ -49,6 +49,23 @@ jobs:
           source: "gateway-service-image.tar"
           target: "/volume1/docker/pyokemon/gateway-service"
 
+      - name: Check Docker installation on NAS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.NAS_HOST }}
+          username: ${{ secrets.NAS_USER }}
+          port: ${{ secrets.NAS_SSH_PORT }}
+          key: ${{ secrets.NAS_SSH_PRIVATE_KEY }}
+          script: |
+            echo "현재 경로: $(pwd)"
+            echo "환경 변수 PATH: $PATH"
+            # Docker 실행 파일 위치 확인
+            which docker || echo "Docker 실행 파일을 찾을 수 없습니다."
+            # 일반적인 Docker 위치 확인
+            ls -la /usr/bin/docker || echo "/usr/bin/docker 없음"
+            ls -la /usr/local/bin/docker || echo "/usr/local/bin/docker 없음"
+            ls -la /volume1/\@appstore/Docker/usr/bin/docker || echo "/volume1/\@appstore/Docker/usr/bin/docker 없음"
+
       - name: Start Docker container on NAS
         uses: appleboy/ssh-action@master
         with:
@@ -59,24 +76,39 @@ jobs:
           script: |
             cd /volume1/docker/pyokemon/gateway-service
             
+            # Docker 경로 설정
+            export PATH="/usr/local/bin:/usr/bin:/volume1/@appstore/Docker/usr/bin:$PATH"
+            
             # 이미지 로드
-            docker load < gateway-service-image.tar
+            echo "Docker 버전 확인"
+            docker version || echo "Docker 버전 확인 실패"
+            
+            echo "Docker 이미지 로드 시작"
+            docker load < gateway-service-image.tar || echo "Docker 이미지 로드 실패"
             
             # 기존 컨테이너 중지 및 삭제
+            echo "기존 컨테이너 확인"
+            docker ps -a | grep gateway-service || echo "실행 중인 gateway-service 컨테이너 없음"
+            
             if docker ps -a --filter "name=gateway-service" --format "{{.ID}}" | grep -q .; then
-              docker stop gateway-service || true
-              docker rm gateway-service || true
-              echo "기존 컨테이너 삭제 완료"
+              echo "기존 컨테이너 중지 중..."
+              docker stop gateway-service || echo "컨테이너 중지 실패"
+              echo "기존 컨테이너 삭제 중..."
+              docker rm gateway-service || echo "컨테이너 삭제 실패"
             fi
             
             # 새 컨테이너 실행
+            echo "새 컨테이너 실행 중..."
             docker run -d \
               --name gateway-service \
               --restart always \
               -p 8086:8086 \
               -v /volume1/docker/pyokemon/gateway-service/logs:/app/logs \
-              pyokemon/gateway-service:latest
+              pyokemon/gateway-service:latest || echo "컨테이너 실행 실패"
               
             # 컨테이너 상태 확인
-            docker ps | grep gateway-service
+            echo "컨테이너 상태:"
+            docker ps | grep gateway-service || echo "컨테이너가 실행되지 않음"
+            echo "Docker 로그:"
+            docker logs gateway-service || echo "로그 확인 실패"
             echo "Docker 배포 완료"
