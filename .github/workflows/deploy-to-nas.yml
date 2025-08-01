@@ -63,6 +63,15 @@ jobs:
             
             # 애플리케이션 실행 및 PID 저장
             echo "애플리케이션 시작"
-            nohup java -jar gateway-service-0.0.1.jar > app.log 2>&1 &
+            # Java 경로 확인
+            JAVA_PATH=$(which java || echo "/usr/bin/java")
+            echo "사용할 Java 경로: $JAVA_PATH"
+            
+            # 환경 변수 설정
+            export PATH=$PATH:/usr/bin:/usr/local/bin
+            export JAVA_HOME=$(dirname $(dirname $JAVA_PATH))
+            
+            # 애플리케이션 실행
+            nohup $JAVA_PATH -jar gateway-service-0.0.1.jar > app.log 2>&1 &
             echo $! > app.pid
             echo "배포 완료 (PID: $(cat app.pid))"
