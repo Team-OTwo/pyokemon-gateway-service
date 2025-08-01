@@ -1,0 +1,69 @@
+server:
+  port: 8086
+  
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          # Account 서비스 라우팅
+          - id: account-service
+            predicates:
+              - Path=/api/account/**
+            uri: http://localhost:8080
+            filters:
+              - AddAuthenticationHeader
+              - RewritePath=/api/account/(?<segment>.*), /account/api/$\{segment}
+            
+          # Event 서비스 라우팅  
+          - id: event-service
+            predicates:
+              - Path=/api/events/**
+            uri: http://localhost:8081
+            filters:
+              - AddAuthenticationHeader
+              - RewritePath=/api/events/(?<segment>.*), /events/api/$\{segment}
+              
+          # Payment 서비스 라우팅
+          - id: payment-service
+            predicates:
+              - Path=/api/payment/**
+            uri: http://localhost:8082
+            filters:
+              - AddAuthenticationHeader
+              - RewritePath=/api/payment/(?<segment>.*), /payment/api/$\{segment}
+              
+          # DID 서비스 라우팅
+          - id: did-service
+            predicates:
+              - Path=/api/did/**
+            uri: http://localhost:8083
+            filters:
+              - AddAuthenticationHeader
+              - RewritePath=/api/did/(?<segment>.*), /did/api/$\{segment}
+              
+          # Notification 서비스 라우팅
+          - id: noti-service
+            predicates:
+              - Path=/api/noti/**
+            uri: http://localhost:8084
+            filters:
+              - AddAuthenticationHeader
+              - RewritePath=/api/noti/(?<segment>.*), /noti/api/$\{segment}
+              
+          # BFF 서비스 라우팅
+          - id: bff-service
+            predicates:
+              - Path=/api/bff/**
+            uri: http://localhost:8085
+            filters:
+              - AddAuthenticationHeader
+              - RewritePath=/api/bff/(?<segment>.*), /bff/api/$\{segment}
+
+jwt:
+  header: Authorization
+  secretKey: cHlva2Vtb24tYWNjb3VudC1qd3Qtc2VjcmV0LWtleS0yMDI0LXZlcnktbG9uZy1zZWNyZXQta2V5LWZvci1zZWN1cml0eQ==
+  expiresIn: 86400000
+  mobileExpiresIn: 86400000
