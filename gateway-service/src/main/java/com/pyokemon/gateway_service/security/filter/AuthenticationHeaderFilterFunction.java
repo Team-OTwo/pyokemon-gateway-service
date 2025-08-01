@@ -44,37 +44,34 @@ class AuthenticationHeaderFilterFunction {
                 log.error("사용자 인증 정보 추출 중 오류: {}", e.getMessage(), e);
             }
             
-            try {
-                String device = extractDeviceFromUserAgent(request);
-                requestBuilder.header("X-Client-Device", device);
-                log.info("X-Client-Device 헤더 추가됨: {}", device);
-            } catch (Exception e) {
-                log.warn("디바이스 정보 추출 실패: {}", e.getMessage());
-                requestBuilder.header("X-Client-Device", "unknown");
-            }
-            
-            log.info("=== 헤더 추가 완료 ===");
+//            try {
+//                String device = extractDeviceFromUserAgent(request);
+//                requestBuilder.header("X-Client-Device", device);
+//                log.info("X-Client-Device 헤더 추가됨: {}", device);
+//            } catch (Exception e) {
+//                log.warn("디바이스 정보 추출 실패: {}", e.getMessage());
+//                requestBuilder.header("X-Client-Device", "unknown");
+//            }
             return requestBuilder.build();
         };
     }
     
-    private static String extractDeviceFromUserAgent(ServerRequest request) {
-        String userAgent = request.headers().firstHeader("User-Agent");
-        if (userAgent == null || userAgent.isEmpty()) {
-            return "unknown";
-        }
-        
-        userAgent = userAgent.toLowerCase();
-        
-        // Todo: 디바이스 정보 서비스에 맞게 수정해야함
-        if (userAgent.contains("mobile") || userAgent.contains("android") || userAgent.contains("iphone")) {
-            return "MOBILE";
-        } else if (userAgent.contains("tablet") || userAgent.contains("ipad")) {
-            return "TABLET";
-        } else if (userAgent.contains("postman") || userAgent.contains("curl")) {
-            return "API_CLIENT";
-        } else {
-            return "WEB";
-        }
-    }
+//    private static String extractDeviceFromUserAgent(ServerRequest request) {
+//        String userAgent = request.headers().firstHeader("User-Agent");
+//        if (userAgent == null || userAgent.isEmpty()) {
+//            return "unknown";
+//        }
+//
+//        userAgent = userAgent.toLowerCase();
+//
+//        if (userAgent.contains("mobile") || userAgent.contains("android") || userAgent.contains("iphone")) {
+//            return "MOBILE";
+//        } else if (userAgent.contains("tablet") || userAgent.contains("ipad")) {
+//            return "TABLET";
+//        } else if (userAgent.contains("postman") || userAgent.contains("curl")) {
+//            return "API_CLIENT";
+//        } else {
+//            return "WEB";
+//        }
+//    }
 }
