@@ -43,7 +43,7 @@ jobs:
           port: ${{ secrets.NAS_SSH_PORT }}
           key: ${{ secrets.NAS_SSH_PRIVATE_KEY }}
           script: |
-            cd ${{ secrets.DEPLOY_PATH }}
+            cd /volume1/docker/pyokemon/gateway-service
             if ps -ef | grep "java.*gateway-service" | grep -v grep > /dev/null; then
               for pid in $(ps -ef | grep "java.*gateway-service" | grep -v grep | awk '{print $2}'); do
                 echo "Stopping process $pid"
