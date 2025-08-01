@@ -23,19 +23,33 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build -x test
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        
+      - name: Build and export Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          load: true
+          tags: pyokemon/gateway-service:latest
+          
+      - name: Save Docker image
+        run: |
+          docker save pyokemon/gateway-service:latest > gateway-service-image.tar
+          ls -la gateway-service-image.tar
 
-      - name: Deploy to Synology NAS
+      - name: Deploy Docker image to Synology NAS
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.NAS_HOST }}
           username: ${{ secrets.NAS_USER }}
           port: ${{ secrets.NAS_SSH_PORT }}
           key: ${{ secrets.NAS_SSH_PRIVATE_KEY }}
-          source: "build/libs/*.jar"
+          source: "gateway-service-image.tar"
           target: "/volume1/docker/pyokemon/gateway-service"
-          strip_components: 2
 
-      - name: Restart Service
+      - name: Start Docker container on NAS
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.NAS_HOST }}
@@ -43,10 +57,26 @@ jobs:
           port: ${{ secrets.NAS_SSH_PORT }}
           key: ${{ secrets.NAS_SSH_PRIVATE_KEY }}
           script: |
-            cd ${{ secrets.DEPLOY_PATH }}
-            if pgrep -f "java.*gateway-service" > /dev/null; then
-              pkill -f "java.*gateway-service"
-              sleep 5
+            cd /volume1/docker/pyokemon/gateway-service
+            
+            # 이미지 로드
+            docker load < gateway-service-image.tar
+            
+            # 기존 컨테이너 중지 및 삭제
+            if docker ps -a --filter "name=gateway-service" --format "{{.ID}}" | grep -q .; then
+              docker stop gateway-service || true
+              docker rm gateway-service || true
+              echo "기존 컨테이너 삭제 완료"
             fi
-            nohup java -jar gateway-service-0.0.1.jar > app.log 2>&1 &
-            echo "배포 완료"
+            
+            # 새 컨테이너 실행
+            docker run -d \
+              --name gateway-service \
+              --restart always \
+              -p 8086:8086 \
+              -v /volume1/docker/pyokemon/gateway-service/logs:/app/logs \
+              pyokemon/gateway-service:latest
+              
+            # 컨테이너 상태 확인
+            docker ps | grep gateway-service
+            echo "Docker 배포 완료"
