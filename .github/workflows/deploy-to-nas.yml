@@ -23,52 +23,102 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build -x test
-        
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        
-      - name: Build and export Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          load: true
-          tags: pyokemon/gateway-service:latest
-          
-      - name: Save Docker image
-        run: |
-          docker save pyokemon/gateway-service:latest > gateway-service-image.tar
-          ls -la gateway-service-image.tar
 
-      - name: Deploy Docker image to Synology NAS
+      # JAR 파일로 직접 배포하는 방식으로 변경
+      - name: Deploy JAR to Synology NAS
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.NAS_HOST }}
           username: ${{ secrets.NAS_USER }}
           port: ${{ secrets.NAS_SSH_PORT }}
           key: ${{ secrets.NAS_SSH_PRIVATE_KEY }}
-          source: "gateway-service-image.tar"
+          source: "build/libs/*.jar"
           target: "/volume1/docker/pyokemon/gateway-service"
+          strip_components: 2
 
-      - name: Check Docker installation on NAS
-        uses: appleboy/ssh-action@master
+      # 서비스 컨트롤 스크립트 업로드
+      - name: Create Service Script
+        run: |
+          cat > service.sh << 'EOF'
+          #!/bin/bash
+          SERVICE_NAME="gateway-service"
+          JAR_PATH="/volume1/docker/pyokemon/gateway-service/gateway-service-0.0.1.jar"
+          LOG_FILE="/volume1/docker/pyokemon/gateway-service/app.log"
+          PID_FILE="/volume1/docker/pyokemon/gateway-service/app.pid"
+          
+          start_service() {
+            if [ -f "$PID_FILE" ] && ps -p $(cat "$PID_FILE") > /dev/null; then
+              echo "서비스가 이미 실행 중입니다."
+              return 1
+            fi
+            
+            echo "서비스 시작 중..."
+            nohup java -jar "$JAR_PATH" > "$LOG_FILE" 2>&1 &
+            echo $! > "$PID_FILE"
+            echo "서비스가 시작되었습니다. (PID: $(cat $PID_FILE))"
+          }
+          
+          stop_service() {
+            if [ ! -f "$PID_FILE" ]; then
+              echo "PID 파일을 찾을 수 없습니다."
+              return 1
+            fi
+            
+            PID=$(cat "$PID_FILE")
+            if ps -p $PID > /dev/null; then
+              echo "서비스 중지 중... (PID: $PID)"
+              kill $PID
+              rm "$PID_FILE"
+              echo "서비스가 중지되었습니다."
+            else
+              echo "서비스가 실행 중이 아닙니다."
+              rm "$PID_FILE"
+            fi
+          }
+          
+          status_service() {
+            if [ -f "$PID_FILE" ] && ps -p $(cat "$PID_FILE") > /dev/null; then
+              echo "서비스가 실행 중입니다. (PID: $(cat $PID_FILE))"
+            else
+              echo "서비스가 실행 중이 아닙니다."
+            fi
+          }
+          
+          case "$1" in
+            start)
+              start_service
+              ;;
+            stop)
+              stop_service
+              ;;
+            restart)
+              stop_service
+              sleep 5
+              start_service
+              ;;
+            status)
+              status_service
+              ;;
+            *)
+              echo "사용법: $0 {start|stop|restart|status}"
+              exit 1
+          esac
+          exit 0
+          EOF
+          
+          chmod +x service.sh
+
+      - name: Deploy Service Script
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.NAS_HOST }}
           username: ${{ secrets.NAS_USER }}
           port: ${{ secrets.NAS_SSH_PORT }}
           key: ${{ secrets.NAS_SSH_PRIVATE_KEY }}
-          script: |
-            echo "현재 경로: $(pwd)"
-            echo "환경 변수 PATH: $PATH"
-            echo "현재 사용자: $(whoami)"
-            echo "사용자 그룹: $(groups)"
-            
-            # Docker 실행 파일 위치 확인
-            which docker || echo "Docker 실행 파일을 찾을 수 없습니다."
-            
-            # Docker 그룹 확인
-            getent group docker || echo "docker 그룹이 존재하지 않습니다."
+          source: "service.sh"
+          target: "/volume1/docker/pyokemon/gateway-service"
 
-      - name: Start Docker container on NAS
+      - name: Restart Service
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.NAS_HOST }}
@@ -77,40 +127,18 @@ jobs:
           key: ${{ secrets.NAS_SSH_PRIVATE_KEY }}
           script: |
             cd /volume1/docker/pyokemon/gateway-service
+            chmod +x service.sh
             
-            # Docker 경로 설정
-            export PATH="/usr/local/bin:/usr/bin:/volume1/@appstore/Docker/usr/bin:$PATH"
+            echo "서비스 상태 확인"
+            ./service.sh status || echo "상태 확인 실패"
             
-            # sudo로 권한 확보하여 Docker 명령어 실행
-            echo "Docker 버전 확인"
-            sudo docker version || echo "Docker 버전 확인 실패"
+            echo "서비스 재시작"
+            ./service.sh restart
             
-            echo "Docker 이미지 로드 시작"
-            sudo docker load < gateway-service-image.tar || echo "Docker 이미지 로드 실패"
+            echo "서비스 상태 재확인"
+            ./service.sh status
             
-            # 기존 컨테이너 중지 및 삭제
-            echo "기존 컨테이너 확인"
-            sudo docker ps -a | grep gateway-service || echo "실행 중인 gateway-service 컨테이너 없음"
+            echo "로그 확인"
+            tail -n 20 app.log || echo "로그 파일을 찾을 수 없습니다."
             
-            if sudo docker ps -a --filter "name=gateway-service" --format "{{.ID}}" | grep -q .; then
-              echo "기존 컨테이너 중지 중..."
-              sudo docker stop gateway-service || echo "컨테이너 중지 실패"
-              echo "기존 컨테이너 삭제 중..."
-              sudo docker rm gateway-service || echo "컨테이너 삭제 실패"
-            fi
-            
-            # 새 컨테이너 실행
-            echo "새 컨테이너 실행 중..."
-            sudo docker run -d \
-              --name gateway-service \
-              --restart always \
-              -p 8086:8086 \
-              -v /volume1/docker/pyokemon/gateway-service/logs:/app/logs \
-              pyokemon/gateway-service:latest || echo "컨테이너 실행 실패"
-              
-            # 컨테이너 상태 확인
-            echo "컨테이너 상태:"
-            sudo docker ps | grep gateway-service || echo "컨테이너가 실행되지 않음"
-            echo "Docker 로그:"
-            sudo docker logs gateway-service || echo "로그 확인 실패"
-            echo "Docker 배포 완료"
+            echo "배포 완료"
