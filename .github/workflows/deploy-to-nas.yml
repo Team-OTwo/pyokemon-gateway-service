@@ -44,12 +44,25 @@ jobs:
           key: ${{ secrets.NAS_SSH_PRIVATE_KEY }}
           script: |
             cd /volume1/docker/pyokemon/gateway-service
-            if ps -ef | grep "java.*gateway-service" | grep -v grep > /dev/null; then
-              for pid in $(ps -ef | grep "java.*gateway-service" | grep -v grep | awk '{print $2}'); do
-                echo "Stopping process $pid"
-                kill $pid || kill -9 $pid || echo "Failed to kill process $pid"
-              done
-              sleep 5
+            
+            # 이전 프로세스 종료
+            if [ -f "app.pid" ]; then
+              echo "이전 PID 파일 발견"
+              PID=$(cat app.pid)
+              if ps -p $PID > /dev/null 2>&1; then
+                echo "프로세스 $PID 종료 시도"
+                kill $PID && echo "프로세스 종료 성공" || echo "프로세스 종료 실패"
+                sleep 5
+              else
+                echo "프로세스가 이미 종료됨"
+              fi
+              rm -f app.pid
+            else
+              echo "PID 파일 없음, 계속 진행"
             fi
+            
+            # 애플리케이션 실행 및 PID 저장
+            echo "애플리케이션 시작"
             nohup java -jar gateway-service-0.0.1.jar > app.log 2>&1 &
-            echo "배포 완료"
+            echo $! > app.pid
+            echo "배포 완료 (PID: $(cat app.pid))"
