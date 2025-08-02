@@ -48,30 +48,30 @@ public class WebSecurityConfig {
                                 .authenticationEntryPoint(authenticationEntryPoint)
                                 .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(registry -> registry
+                        // 임시로 모든 API에 대한 인증 해제
+                        .anyRequest().permitAll()
+                        
+                        // 원래 설정
+                        /* 
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
                         .requestMatchers("/api/gateway/v1/**").permitAll()
-
                         .requestMatchers(
                                 "/api/account/login",
                                 "/api/account/logout",
                                 "/api/account/refresh"
                         ).permitAll()
-
                         .requestMatchers(
                                 "/api/events/open-today",
                                 "/api/events/to-be-opened"
                         ).permitAll()
-
                         .requestMatchers("/api/payment/webhook/**").permitAll()
-
                         .requestMatchers(
                                 "/health/**",
                                 "/actuator/**",
                                 "/actuator/health/**"
                         ).permitAll()
-
                         .anyRequest().authenticated()
+                        */
                 );
         return http.build();
     }
