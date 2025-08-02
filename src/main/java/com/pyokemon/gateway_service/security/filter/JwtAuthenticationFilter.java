@@ -68,7 +68,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
     
     private boolean isPublicPath(String requestURI) {
-        return PUBLIC_PATHS.stream()
-                .anyMatch(path -> requestURI.startsWith(path));
+        // 임시로 모든 API에 대해 인증 해제
+        return true;
+        
+        // 원래 코드
+        /*return PUBLIC_PATHS.stream()
+                .anyMatch(path -> requestURI.startsWith(path));*/
     }
 }
