@@ -15,7 +15,7 @@ spring:
             uri: http://localhost:8080
             filters:
               - AddAuthenticationHeader
-              - RewritePath=/api/account/(?<segment>.*), /account/api/$\{segment}
+              - RewritePath=/account/api/(?<segment>.*), /account/api/$\{segment}
             
           # Event 서비스 라우팅  
           - id: event-service
@@ -25,7 +25,7 @@ spring:
             filters:
               # 임시로 인증 헤더 필터 제거
               # - AddAuthenticationHeader
-              - RewritePath=/api/events/(?<segment>.*), /events/api/$\{segment}
+              # - RewritePath=/event/api/(?<segment>.*), /events/api/$\{segment}
               
           # Payment 서비스 라우팅
           - id: payment-service
@@ -35,7 +35,7 @@ spring:
             filters:
               # 임시로 인증 헤더 필터 제거
               # - AddAuthenticationHeader
-              - RewritePath=/api/payment/(?<segment>.*), /payment/api/$\{segment}
+              # - RewritePath=/payment/api/(?<segment>.*), /payment/api/$\{segment}
               
           # DID 서비스 라우팅
           - id: did-service
@@ -44,7 +44,7 @@ spring:
             uri: http://localhost:8083
             filters:
               - AddAuthenticationHeader
-              - RewritePath=/api/did/(?<segment>.*), /did/api/$\{segment}
+              #- RewritePath=/api/did/(?<segment>.*), /did/api/$\{segment}
               
           # Notification 서비스 라우팅
           - id: noti-service
@@ -53,7 +53,7 @@ spring:
             uri: http://localhost:8084
             filters:
               - AddAuthenticationHeader
-              - RewritePath=/api/noti/(?<segment>.*), /noti/api/$\{segment}
+              #- RewritePath=/api/noti/(?<segment>.*), /noti/api/$\{segment}
               
           # BFF 서비스 라우팅
           - id: bff-service
@@ -62,7 +62,7 @@ spring:
             uri: http://localhost:8085
             filters:
               - AddAuthenticationHeader
-              - RewritePath=/api/bff/(?<segment>.*), /bff/api/$\{segment}
+              #- RewritePath=/api/bff/(?<segment>.*), /bff/api/$\{segment}
 jwt:
   header: Authorization
   secretKey: cHlva2Vtb24tYWNjb3VudC1qd3Qtc2VjcmV0LWtleS0yMDI0LXZlcnktbG9uZy1zZWNyZXQta2V5LWZvci1zZWN1cml0eQ==
