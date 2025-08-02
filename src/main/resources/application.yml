@@ -11,7 +11,7 @@ spring:
           # Account 서비스 라우팅
           - id: account-service
             predicates:
-              - Path=/api/account/**
+              - Path=/account/**
             uri: http://localhost:8080
             filters:
               - AddAuthenticationHeader
@@ -20,7 +20,7 @@ spring:
           # Event 서비스 라우팅  
           - id: event-service
             predicates:
-              - Path=/api/events/**
+              - Path=/event/**
             uri: http://localhost:8081
             filters:
               - AddAuthenticationHeader
@@ -29,7 +29,7 @@ spring:
           # Payment 서비스 라우팅
           - id: payment-service
             predicates:
-              - Path=/api/payment/**
+              - Path=/payment/**
             uri: http://localhost:8082
             filters:
               - AddAuthenticationHeader
@@ -38,7 +38,7 @@ spring:
           # DID 서비스 라우팅
           - id: did-service
             predicates:
-              - Path=/api/did/**
+              - Path=/did/**
             uri: http://localhost:8083
             filters:
               - AddAuthenticationHeader
@@ -47,7 +47,7 @@ spring:
           # Notification 서비스 라우팅
           - id: noti-service
             predicates:
-              - Path=/api/noti/**
+              - Path=/noti/**
             uri: http://localhost:8084
             filters:
               - AddAuthenticationHeader
@@ -56,14 +56,17 @@ spring:
           # BFF 서비스 라우팅
           - id: bff-service
             predicates:
-              - Path=/api/bff/**
+              - Path=/bff/**
             uri: http://localhost:8085
             filters:
               - AddAuthenticationHeader
               - RewritePath=/api/bff/(?<segment>.*), /bff/api/$\{segment}
-
 jwt:
   header: Authorization
   secretKey: cHlva2Vtb24tYWNjb3VudC1qd3Qtc2VjcmV0LWtleS0yMDI0LXZlcnktbG9uZy1zZWNyZXQta2V5LWZvci1zZWN1cml0eQ==
   expiresIn: 86400000
   mobileExpiresIn: 86400000
+
+logging:
+  level:
+    root: debug
