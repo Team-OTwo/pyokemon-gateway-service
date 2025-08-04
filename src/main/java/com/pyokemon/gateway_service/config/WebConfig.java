@@ -13,25 +13,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     
+    // WebMvcConfigurer의 CORS 설정은 제거하고 단일 CorsFilter만 사용
+    /*
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
             .allowedOrigins("*")
-            /* 
-            .allowedOrigins(
-                "https://pyokemon.synology.me/user",
-                "https://pyokemon.synology.me/tenant",
-                "https://pyokemon.synology.me",
-                "http://pyokemon.synology.me",
-                "http://localhost:5173",
-                "http://localhost:6080")
-            */
             .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
             .allowedHeaders("*")
             .exposedHeaders("Authorization", "Content-Disposition")
             .allowCredentials(false)
             .maxAge(3600);
     }
+    */
     
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -41,17 +35,10 @@ public class WebConfig implements WebMvcConfigurer {
         
         config.setAllowCredentials(false);
         config.addAllowedOrigin("*");
-        /*
-        config.addAllowedOrigin("https://pyokemon.synology.me");
-        config.addAllowedOrigin("https://pyokemon.synology.me/user");
-        config.addAllowedOrigin("https://pyokemon.synology.me/tenant");
-        config.addAllowedOrigin("http://pyokemon.synology.me");
-        config.addAllowedOrigin("http://localhost:5173");
-        config.addAllowedOrigin("http://localhost:6080");
-        */
         
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
+        config.setExposedHeaders(java.util.Arrays.asList("Authorization", "Content-Disposition"));
         config.setMaxAge(3600L);
         
         source.registerCorsConfiguration("/**", config);
