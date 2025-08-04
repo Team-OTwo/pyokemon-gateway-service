@@ -59,7 +59,10 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
+        config.setAllowCredentials(false);
+        // 와일드카드 사용
+        config.setAllowedOrigins(List.of("*"));
+        /*
         config.setAllowedOrigins(List.of(
                 "https://pyokemon.synology.me/user",
                 "https://pyokemon.synology.me/tenant",
@@ -68,6 +71,7 @@ public class WebSecurityConfig {
                 "http://localhost:5173",
                 "http://localhost:6080"
         ));
+        */
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization", "Content-Disposition", "Access-Control-Allow-Origin"));

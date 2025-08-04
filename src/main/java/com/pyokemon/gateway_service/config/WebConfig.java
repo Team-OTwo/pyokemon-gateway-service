@@ -16,6 +16,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
+            .allowedOrigins("*")
+            /* 
             .allowedOrigins(
                 "https://pyokemon.synology.me/user",
                 "https://pyokemon.synology.me/tenant",
@@ -23,10 +25,11 @@ public class WebConfig implements WebMvcConfigurer {
                 "http://pyokemon.synology.me",
                 "http://localhost:5173",
                 "http://localhost:6080")
+            */
             .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
             .allowedHeaders("*")
             .exposedHeaders("Authorization", "Content-Disposition")
-            .allowCredentials(true)
+            .allowCredentials(false)
             .maxAge(3600);
     }
     
@@ -36,13 +39,16 @@ public class WebConfig implements WebMvcConfigurer {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         
-        config.setAllowCredentials(true);
+        config.setAllowCredentials(false);
+        config.addAllowedOrigin("*");
+        /*
         config.addAllowedOrigin("https://pyokemon.synology.me");
         config.addAllowedOrigin("https://pyokemon.synology.me/user");
         config.addAllowedOrigin("https://pyokemon.synology.me/tenant");
         config.addAllowedOrigin("http://pyokemon.synology.me");
         config.addAllowedOrigin("http://localhost:5173");
         config.addAllowedOrigin("http://localhost:6080");
+        */
         
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
