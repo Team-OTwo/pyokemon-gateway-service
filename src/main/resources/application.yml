@@ -72,3 +72,11 @@ jwt:
 logging:
   level:
     root: debug
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+    import:
+      - classpath:dev-config.yml
