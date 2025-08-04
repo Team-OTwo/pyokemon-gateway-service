@@ -50,7 +50,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(registry -> registry
                         // 임시로 모든 API에 대한 인증 해제
                         .anyRequest().permitAll()
-                        
+
                         // 원래 설정
                         /* 
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -83,14 +83,13 @@ public class WebSecurityConfig {
 // config.setAllowedOrigins(List.of("*"));
         // config.setAllowedOriginPatterns(List.of("*"));
         config.setAllowedOrigins(List.of(
-            "https://pyokemon.synology.me/user",
-            "https://pyokemon.synology.me/tenant",
+            "https://pyokemon.synology.me",
             "http://localhost:5173",
             "http://localhost:6080"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setExposedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("*"));       
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
