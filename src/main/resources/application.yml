@@ -21,7 +21,7 @@ spring:
           - id: event-service
             predicates:
               - Path=/event/**
-            uri: http://pyokemon.synology.me:8081
+            uri: http://localhost:8081
             filters:
               # 임시로 인증 헤더 필터 제거
               # - AddAuthenticationHeader
