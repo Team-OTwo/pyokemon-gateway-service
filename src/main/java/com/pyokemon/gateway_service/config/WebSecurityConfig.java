@@ -81,14 +81,15 @@ public class WebSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.setAllowedOrigins(List.of(
-            "https://pyokemon.synology.me",
+                "https://pyokemon.synology.me/user",
+                "https://pyokemon.synology.me/tenant",
+                "https://pyokemon.synology.me",
             "http://pyokemon.synology.me",
             "http://localhost:5173",
             "http://localhost:6080"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", 
-            "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
+        config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization", "Content-Disposition"));
         config.setMaxAge(3600L); // 1시간 동안 preflight 요청 결과 캐싱
         
