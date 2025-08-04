@@ -40,6 +40,8 @@ public class WebSecurityConfig {
                         -> sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
+                // SSL 클라이언트 인증 비활성화
+                .x509(AbstractHttpConfigurer::disable)
                 .addFilterBefore(
                         new JwtAuthenticationFilter(jwtTokenValidator),
                         UsernamePasswordAuthenticationFilter.class)
@@ -84,13 +86,13 @@ public class WebSecurityConfig {
                 "https://pyokemon.synology.me/user",
                 "https://pyokemon.synology.me/tenant",
                 "https://pyokemon.synology.me",
-            "http://pyokemon.synology.me",
-            "http://localhost:5173",
-            "http://localhost:6080"
+                "http://pyokemon.synology.me",
+                "http://localhost:5173",
+                "http://localhost:6080"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setExposedHeaders(List.of("Authorization", "Content-Disposition"));
+        config.setExposedHeaders(List.of("Authorization", "Content-Disposition", "Access-Control-Allow-Origin"));
         config.setMaxAge(3600L); // 1시간 동안 preflight 요청 결과 캐싱
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
