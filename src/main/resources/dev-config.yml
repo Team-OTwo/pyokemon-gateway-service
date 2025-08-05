@@ -6,3 +6,13 @@ server:
     key-store-type: PKCS12
     key-alias: gateway-service
     client-auth: none
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
