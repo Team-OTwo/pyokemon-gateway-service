@@ -1,6 +1,6 @@
 server:
   ssl:
-    enabled: true
+    enabled: false
     key-store: classpath:keystore.p12
     key-store-password: 
     key-store-type: PKCS12
