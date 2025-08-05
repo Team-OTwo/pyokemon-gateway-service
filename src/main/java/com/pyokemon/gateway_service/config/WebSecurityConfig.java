@@ -46,6 +46,33 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(registry -> registry
                         // 임시로 모든 API에 대한 인증 해제
                         .anyRequest().permitAll()
+                        // .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // .requestMatchers("/api/gateway/v1/**").permitAll()
+
+                        // .requestMatchers(
+                        //         "/account/login",
+                        //         "/account/app/login",
+                        //         "/account/users"
+                        // ).permitAll()
+                        // // Todo: 경로 맞추기
+                        // .requestMatchers(
+                        //         "/api/events",
+                        //         "/api/events/open-today",
+                        //         "/api/events/to-be-opened"
+                        // ).permitAll()
+
+                        // .requestMatchers("/api/events/**").permitAll()
+                        // .requestMatchers("/api/event-schedules/**").permitAll()
+                        // .requestMatchers("/api/seats").permitAll()
+
+                        // .requestMatchers(
+                        //         "/health/**",
+                        //         "/actuator/**",
+                        //         "/actuator/health/**"
+                        // ).permitAll()
+
+                        // .anyRequest().authenticated()
                 );
         return http.build();
     }

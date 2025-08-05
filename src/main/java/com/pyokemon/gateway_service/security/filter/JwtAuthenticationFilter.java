@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -19,14 +20,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenValidator jwtTokenValidator;
-    
-    // 공개 API 경로들 (토큰 검증 제외)
-    private static final List<String> PUBLIC_PATHS = Arrays.asList(
-        "/api/account/login",
-        "/api/account/logout",
-        // "/api/events/open-today",
-        // "/api/events/to-be-opened",
-        // "/api/payment/webhook",
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
+    // 정적 공개 경로들
+    private static final List<String> STATIC_PUBLIC_PATHS = Arrays.asList(
         "/health",
         "/actuator",
         "/api/gateway/v1"
@@ -36,22 +33,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        
+
         String requestURI = request.getRequestURI();
-        
-        if (isPublicPath(requestURI)) {
+        String requestMethod = request.getMethod();
+
+        if (isPublicPath(requestURI, requestMethod)) {
             filterChain.doFilter(request, response);
             return;
         }
-        
+
         try {
             String jwtToken = jwtTokenValidator.getToken(request);
-            
+
             if (jwtToken != null) {
                 JwtAuthentication authentication = jwtTokenValidator.validateToken(jwtToken);
                 if (authentication != null) {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-                    log.info("JWT 토큰 검증 성공. 사용자: {}", 
+                    log.info("JWT 토큰 검증 성공. 사용자: {}",
                              authentication.getPrincipal().getName());
                 } else {
                     log.warn("JWT 토큰 검증 실패");
@@ -59,20 +57,60 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             } else {
                 log.info("JWT 토큰이 없음");
             }
-            
+
         } catch (Exception e) {
             log.error("JWT 토큰 검증 중 오류: {}", e.getMessage(), e);
         }
-        
+
         filterChain.doFilter(request, response);
     }
-    
-    private boolean isPublicPath(String requestURI) {
-        // 임시로 모든 API에 대해 인증 해제
+
+    private boolean isPublicPath(String requestURI, String method) {
+
+         // 임시로 모든 API에 대해 인증 해제
         return true;
         
-        // 원래 코드
-        /*return PUBLIC_PATHS.stream()
-                .anyMatch(path -> requestURI.startsWith(path));*/
+        // // 정적 공개 경로들
+        // if (STATIC_PUBLIC_PATHS.stream().anyMatch(requestURI::startsWith)) {
+        //     return true;
+        // }
+
+        // // 로그인 관련 POST 요청 (공개)
+        // if ("POST".equals(method)) {
+        //     if (requestURI.equals("/account/login") ||
+        //         requestURI.equals("/account/app/login") ||
+        //         requestURI.equals("/account/users") ||
+        //         requestURI.equals("/account/tenants")) {
+        //         return true;
+        //     }
+        // }
+
+        // // GET 요청만 공개
+        // // Todo: api 경로 맞게 수정
+        // if ("GET".equals(method)) {
+        //     // 정확한 경로 매칭
+        //     if (requestURI.equals("/event/events") ||
+        //         requestURI.equals("/event/events/open-today") ||
+        //         requestURI.equals("/event/events/to-be-opened")) {
+        //         return true;
+        //     }
+
+        //     // 쿼리 파라미터가 있는 경로
+        //     if (requestURI.startsWith("/events?") ||
+        //         requestURI.startsWith("/seats?")) {
+        //         return true;
+        //     }
+
+        //     // 동적 경로 패턴
+        //     if (pathMatcher.match("/events/*", requestURI)) {
+        //         return true;
+        //     }
+
+        //     if (pathMatcher.match("/event-schedules/*", requestURI)) {
+        //         return true;
+        //     }
+        // }
+
+        // return false; // 기타 모든 요청은 인증 필요
     }
 }
