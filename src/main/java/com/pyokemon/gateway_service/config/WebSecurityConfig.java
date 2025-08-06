@@ -26,8 +26,8 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain applicationSecurity(HttpSecurity http) throws Exception {
         http
-                // cors 설정은 WebConfig의 corsFilter를 사용
-                .cors(cors -> {})
+                // CORS 설정 비활성화 (WebConfig의 CorsFilter만 사용)
+                .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .securityMatcher("/**")
                 .sessionManagement(sessionManagementConfigurer
