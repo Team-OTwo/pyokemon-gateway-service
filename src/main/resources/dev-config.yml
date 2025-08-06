@@ -2,7 +2,17 @@ server:
   ssl:
     enabled: true
     key-store: classpath:keystore.p12
-    key-store-password: 
+    key-store-password: gatewaypassword
     key-store-type: PKCS12
-    key-alias: myalias
+    key-alias: gateway-service
     client-auth: none
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
