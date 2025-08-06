@@ -45,34 +45,34 @@ public class WebSecurityConfig {
                                 .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(registry -> registry
                         // 임시로 모든 API에 대한 인증 해제
-                        .anyRequest().permitAll()
-                        // .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        //.anyRequest().permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // .requestMatchers("/api/gateway/v1/**").permitAll()
+                        .requestMatchers("/api/gateway/v1/**").permitAll()
 
-                        // .requestMatchers(
-                        //         "/account/login",
-                        //         "/account/app/login",
-                        //         "/account/users"
-                        // ).permitAll()
-                        // // Todo: 경로 맞추기
-                        // .requestMatchers(
-                        //         "/api/events",
-                        //         "/api/events/open-today",
-                        //         "/api/events/to-be-opened"
-                        // ).permitAll()
+                        .requestMatchers(
+                                "/account/api/login",
+                                "/account/api/app/login",
+                                "/account/api/users"
+                        ).permitAll()
+                        // Todo: 경로 맞추기
+                        .requestMatchers(
+                                "/event/api/events",
+                                "/event/api/events/open-today",
+                                "/event/api/events/to-be-opened"
+                        ).permitAll()
 
-                        // .requestMatchers("/api/events/**").permitAll()
-                        // .requestMatchers("/api/event-schedules/**").permitAll()
-                        // .requestMatchers("/api/seats").permitAll()
+                        .requestMatchers("/event/api/events/**").permitAll()
+                        .requestMatchers("/event/api/event-schedules/**").permitAll()
+                        .requestMatchers("/event/api/seats").permitAll()
 
-                        // .requestMatchers(
-                        //         "/health/**",
-                        //         "/actuator/**",
-                        //         "/actuator/health/**"
-                        // ).permitAll()
+                        .requestMatchers(
+                                "/health/**",
+                                "/actuator/**",
+                                "/actuator/health/**"
+                        ).permitAll()
 
-                        // .anyRequest().authenticated()
+                        .anyRequest().authenticated()
                 );
         return http.build();
     }
