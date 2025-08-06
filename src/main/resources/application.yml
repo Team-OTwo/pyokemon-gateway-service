@@ -63,6 +63,19 @@ spring:
             filters:
               # - AddAuthenticationHeader
               # - RewritePath=/bff/(?<segment>.*), /bff/api/$\{segment}
+      # Gateway CORS 설정
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin Access-Control-Allow-Methods Access-Control-Allow-Headers Access-Control-Expose-Headers Vary, RETAIN_FIRST
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          '[/**]':
+            allowed-origins: "*"
+            allowed-methods: "*"
+            allowed-headers: "*"
+            exposed-headers: "Authorization,Content-Disposition"
+            allow-credentials: false
+            max-age: 3600
 
 jwt:
   header: Authorization
@@ -72,7 +85,8 @@ jwt:
 
 logging:
   level:
-    root: debug
+    root: info
+    com.pyokemon.gateway_service: info
 
 ---
 spring:

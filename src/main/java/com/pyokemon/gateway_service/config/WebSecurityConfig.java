@@ -7,16 +7,12 @@ import com.pyokemon.gateway_service.security.jwt.JwtTokenValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -29,8 +25,8 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain applicationSecurity(HttpSecurity http) throws Exception {
         http
-                // CORS 설정을 완전히 비활성화하는 대신, CorsConfigurationSource를 통해 동일한 설정 적용
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                // CORS 설정은 Spring Cloud Gateway의 globalcors로 처리
+                .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .securityMatcher("/**")
                 .sessionManagement(sessionManagementConfigurer
@@ -51,22 +47,5 @@ public class WebSecurityConfig {
                         .anyRequest().permitAll()
                 );
         return http.build();
-    }
-
-    // Spring Security에서 사용할 CorsConfigurationSource를 직접 정의
-    // WebConfig와 동일한 설정을 사용하여 중복되는 헤더가 생성되지 않게 함
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowCredentials(false); // WebConfig와 동일하게 false 설정
-        configuration.addAllowedOrigin("*");
-        configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("*");
-        configuration.setExposedHeaders(java.util.Arrays.asList("Authorization", "Content-Disposition"));
-        configuration.setMaxAge(3600L);
-        
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
     }
 }

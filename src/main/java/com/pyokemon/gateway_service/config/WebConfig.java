@@ -16,7 +16,11 @@ public class WebConfig implements WebMvcConfigurer {
     public FilterRegistrationBean<RequestResponseLoggingFilter> loggingFilter() {
         FilterRegistrationBean<RequestResponseLoggingFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new RequestResponseLoggingFilter());
-        registrationBean.addUrlPatterns("/*");
+        
+        // 중복 실행 방지를 위해 더 구체적인 URL 패턴 설정 
+        // "/*" 대신 "/account/*", "/event/*" 등 구체적인 패턴 사용
+        registrationBean.addUrlPatterns("/account/*", "/event/*", "/payment/*", "/did/*", "/noti/*", "/bff/*");
+        
         registrationBean.setOrder(Ordered.LOWEST_PRECEDENCE);
         return registrationBean;
     }
