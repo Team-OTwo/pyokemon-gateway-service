@@ -70,8 +70,16 @@ spring:
         add-to-simple-url-handler-mapping: true
         cors-configurations:
           '[/**]':
-            allowed-origins: "*"
-            allowed-methods: "*"
+            allowed-origins:
+              - "http://localhost:5173"
+              - "https://pyokemon.synology.me"
+              - "http://pyokemon.synology.me"
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
             allowed-headers: "*"
             exposed-headers: "Authorization,Content-Disposition"
             allow-credentials: false
@@ -87,7 +95,7 @@ logging:
   level:
     root: info
     com.pyokemon.gateway_service: info
-
+    
 ---
 spring:
   config:
