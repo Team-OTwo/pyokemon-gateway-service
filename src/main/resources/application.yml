@@ -64,7 +64,7 @@ spring:
               # - AddAuthenticationHeader
               # - RewritePath=/bff/(?<segment>.*), /bff/api/$\{segment}
 
-          # BFF 서비스 라우팅
+          # Booking 서비스 라우팅
           - id: booking-service
             predicates:
               - Path=/booking/**
