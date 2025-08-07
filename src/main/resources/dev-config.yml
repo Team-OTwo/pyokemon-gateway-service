@@ -22,3 +22,27 @@ logging:
     name: /volume1/docker/pyokemon/gateway-service/logs/app.log
   level:
     root: debug
+
+
+spring:
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: account-service
+            uri: http://account-service:8080
+
+          - id: event-service
+            uri: http://event-service:8081
+
+          - id: payment-service
+            uri: http://payment-service:8082
+
+          - id: did-service
+            uri: http://did-service:8083
+              
+          - id: noti-service
+            uri: http://noti-service:8084
+              
+          - id: bff-service
+            uri: http://bff-service:8085
