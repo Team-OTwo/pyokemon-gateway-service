@@ -1,7 +1,7 @@
 package com.pyokemon.gateway_service.config;
 
-import com.pyokemon.gateway_service.security.exception.RestAccessDeniedHandler;
-import com.pyokemon.gateway_service.security.exception.RestAuthenticationEntryPoint;
+
+import com.pyokemon.gateway_service.security.filter.JwtAuthenticationFilter;
 import com.pyokemon.gateway_service.security.jwt.JwtTokenValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -23,8 +24,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
     private final JwtTokenValidator jwtTokenValidator;
-    private final RestAuthenticationEntryPoint authenticationEntryPoint;
-    private final RestAccessDeniedHandler accessDeniedHandler;
+
 
     @Bean
     public SecurityFilterChain applicationSecurity(HttpSecurity http) throws Exception {
@@ -37,10 +37,7 @@ public class WebSecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .x509(AbstractHttpConfigurer::disable)
-                .exceptionHandling((exceptionConfig) ->
-                        exceptionConfig
-                                .authenticationEntryPoint(authenticationEntryPoint)
-                                .accessDeniedHandler(accessDeniedHandler))
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenValidator), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(registry -> registry
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/gateway/v1/**").permitAll()
