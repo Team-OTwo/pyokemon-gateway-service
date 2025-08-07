@@ -49,6 +49,9 @@ jobs:
           port: ${{ secrets.NAS_SSH_PORT }}
           key: ${{ secrets.NAS_SSH_PRIVATE_KEY }}
           script: |
+            # PATH 환경변수 설정 추가
+            export PATH=$PATH:/usr/local/bin
+            
             # 대상 디렉토리 생성
             mkdir -p /volume1/docker/pyokemon/gateway-service/logs
 
