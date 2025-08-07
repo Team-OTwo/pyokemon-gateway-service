@@ -13,18 +13,13 @@ import java.io.IOException;
 
 @Component
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
-    @Autowired
-    private HandlerExceptionResolver handlerExceptionResolver;
-
     @Override
-    public void commence(HttpServletRequest request,
-                         HttpServletResponse response,
-                         AuthenticationException authException) throws IOException {
-        Exception exception = authException;
-        Throwable cause = authException.getCause();
-        if (cause instanceof ResourceAccessException accessException) {
-            exception = accessException;
-        }
-        handlerExceptionResolver.resolveException(request, response, null, exception);
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "*");
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"error\": \"Unauthorized\"}");
     }
 }
