@@ -1,4 +1,4 @@
-name: Deploy to Synology NAS
+name: Synology NAS에 Docker 이미지 배포 (GHCR 사용)
 
 on:
   push:
@@ -8,37 +8,40 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: 코드 체크아웃
         uses: actions/checkout@v2
 
-      - name: Set up JDK 21
+      - name: JDK 21 설정
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
 
-      - name: Make gradlew executable
+      - name: gradlew 실행 권한 부여
         run: chmod +x ./gradlew
 
-      - name: Build with Gradle
+      - name: Gradle로 빌드
         run: ./gradlew build -x test
 
-      - name: Login to GitHub Container Registry
+      - name: Docker Buildx 설정
+        uses: docker/setup-buildx-action@v2
+
+      - name: GitHub Container Registry 로그인
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Docker 이미지 빌드 및 푸시
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}/gateway-service:latest
+          tags: ghcr.io/team-otwo/pyokemon-gateway-service/gateway-service:latest
 
-      - name: Deploy to Synology NAS
+      - name: Synology NAS에 배포
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.NAS_HOST }}
@@ -46,17 +49,24 @@ jobs:
           port: ${{ secrets.NAS_SSH_PORT }}
           key: ${{ secrets.NAS_SSH_PRIVATE_KEY }}
           script: |
-            cd /volume1/docker/pyokemon/gateway-service
-            
-            # Docker 이미지 최신 버전 가져오기
+            # 대상 디렉토리 생성
+            mkdir -p /volume1/docker/pyokemon/gateway-service/logs
+
+            # pyokemon-network 확인 및 생성
+            if ! docker network ls | grep -q pyokemon-network; then
+              echo "pyokemon-network 생성"
+              docker network create --driver bridge pyokemon-network
+            fi
+
+            # Docker 이미지 풀
             echo "최신 Docker 이미지 다운로드"
-            docker pull ghcr.io/${{ github.repository }}/gateway-service:latest
-            
+            docker pull ghcr.io/team-otwo/pyokemon-gateway-service/gateway-service:latest
+
             # 기존 컨테이너 중지 및 삭제
             echo "기존 컨테이너 정리"
             docker stop gateway-service || true
             docker rm gateway-service || true
-            
+
             # 새 컨테이너 실행
             echo "새 컨테이너 실행"
             docker run -d \
@@ -64,7 +74,8 @@ jobs:
               --restart unless-stopped \
               -e SPRING_PROFILES_ACTIVE=dev \
               -v /volume1/docker/pyokemon/gateway-service/logs:/app/logs \
+              -p 8086:8086 \
               --network pyokemon-network \
-              ghcr.io/${{ github.repository }}/gateway-service:latest
-            
+              ghcr.io/team-otwo/pyokemon-gateway-service/gateway-service:latest
+
             echo "배포 완료"
