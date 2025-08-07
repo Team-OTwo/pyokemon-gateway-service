@@ -72,7 +72,8 @@ jwt:
 
 logging:
   level:
-    root: debug
+    root: info
+    com.pyokemon.gateway_service: info
 
 ---
 spring:

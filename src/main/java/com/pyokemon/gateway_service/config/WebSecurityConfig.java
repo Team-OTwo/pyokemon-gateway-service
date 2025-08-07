@@ -7,7 +7,6 @@ import com.pyokemon.gateway_service.security.jwt.JwtTokenValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -26,8 +25,8 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain applicationSecurity(HttpSecurity http) throws Exception {
         http
-                // cors 설정은 WebConfig의 corsFilter를 사용
-                .cors(cors -> {})
+                // CORS 설정은 Spring Cloud Gateway의 globalcors로 처리
+                .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .securityMatcher("/**")
                 .sessionManagement(sessionManagementConfigurer
@@ -76,6 +75,4 @@ public class WebSecurityConfig {
                 );
         return http.build();
     }
-
-    // corsConfigurationSource 빈 제거
 }

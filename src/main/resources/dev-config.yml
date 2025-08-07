@@ -11,8 +11,14 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, prometheus
+        include: health,info,metrics,prometheus
   metrics:
     export:
       prometheus:
         enabled: true
+
+logging:
+  file:
+    name: /volume1/docker/pyokemon/gateway-service/logs/app.log
+  level:
+    root: debug
