@@ -1,7 +1,6 @@
 package com.pyokemon.gateway_service.config;
 
 
-import com.pyokemon.gateway_service.security.filter.AuthenticationHeaderFilter;
 import com.pyokemon.gateway_service.security.filter.JwtAuthenticationFilter;
 import com.pyokemon.gateway_service.security.jwt.JwtTokenValidator;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +38,6 @@ public class WebSecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .x509(AbstractHttpConfigurer::disable)
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenValidator), UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(new AuthenticationHeaderFilter(), JwtAuthenticationFilter.class)
                 .authorizeHttpRequests(registry -> registry
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/gateway/v1/**").permitAll()

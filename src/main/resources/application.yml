@@ -15,7 +15,7 @@ spring:
             uri: http://localhost:8080
             filters:
               # 임시로 인증 헤더 필터 제거
-               # - AddAuthenticationHeader
+               - AddAuthenticationHeader
                # - RewritePath=/account/(?<segment>.*), /account/api/$\{segment}
             
           # Event 서비스 라우팅  
@@ -25,7 +25,7 @@ spring:
             uri: http://localhost:8081
             filters:
               # 임시로 인증 헤더 필터 제거
-               # - AddAuthenticationHeader
+               - AddAuthenticationHeader
                # - RewritePath=/event/(?<segment>.*), /event/api/$\{segment}
               
           # Payment 서비스 라우팅
@@ -34,7 +34,7 @@ spring:
               - Path=/payment/**
             uri: http://localhost:8082
             filters:
-               # - AddAuthenticationHeader
+               - AddAuthenticationHeader
                # - RewritePath=/payment/(?<segment>.*), /payment/api/$\{segment}
               
           # DID 서비스 라우팅
@@ -43,7 +43,7 @@ spring:
               - Path=/did/**
             uri: http://localhost:8084
             filters:
-               # - AddAuthenticationHeader
+               - AddAuthenticationHeader
                # - RewritePath=/did/(?<segment>.*), /did/api/$\{segment}
               
           # Notification 서비스 라우팅
@@ -52,7 +52,7 @@ spring:
               - Path=/noti/**
             uri: http://localhost:8085
             filters:
-               # - AddAuthenticationHeader
+               - AddAuthenticationHeader
                # - RewritePath=/noti/(?<segment>.*), /noti/api/$\{segment}
               
           # BFF 서비스 라우팅
