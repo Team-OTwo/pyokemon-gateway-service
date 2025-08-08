@@ -26,8 +26,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final List<String> STATIC_PUBLIC_PATHS = Arrays.asList(
         "/health",
         "/actuator",
-        "/api/gateway/v1"
+        "/api/gateway/v1",
+        "/actuator/prometheus"
     );
+
+    // 계정 관련 공개 경로
+    public static class AccountApi {
+        public static final List<String> PUBLIC_POST_PATHS = Arrays.asList(
+                "/account/api/login",
+                "/account/api/app/login",
+                "/account/api/users",
+                "/account/api/tenants"
+        );
+    }
+
+    // 이벤트 관련 공개 경로
+    public static class EventApi {
+        public static final List<String> PUBLIC_GET_EXACT_PATHS = Arrays.asList(
+                "/event/api/events",
+                "/event/api/events/open-today",
+                "/event/api/events/to-be-opened"
+        );
+
+        public static final List<String> PUBLIC_GET_PREFIX_PATHS = Arrays.asList(
+                "/event/api/events?",
+                "/event/api/seats?"
+        );
+
+        public static final List<String> PUBLIC_GET_PATTERN_PATHS = Arrays.asList(
+                "/event/api/event-schedules/*"
+        );
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -67,50 +96,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private boolean isPublicPath(String requestURI, String method) {
 
-         // 임시로 모든 API에 대해 인증 해제
-        return true;
+        // 임시로 모든 API 인증 해제
+        //return true;
         
-        // // 정적 공개 경로들
-        // if (STATIC_PUBLIC_PATHS.stream().anyMatch(requestURI::startsWith)) {
-        //     return true;
-        // }
+        // 정적 공개 경로들
+        if (STATIC_PUBLIC_PATHS.stream().anyMatch(requestURI::startsWith)) {
+            return true;
+        }
 
-        // // 로그인 관련 POST 요청 (공개)
-        // if ("POST".equals(method)) {
-        //     if (requestURI.equals("/account/login") ||
-        //         requestURI.equals("/account/app/login") ||
-        //         requestURI.equals("/account/users") ||
-        //         requestURI.equals("/account/tenants")) {
-        //         return true;
-        //     }
-        // }
+        // 로그인 관련 POST 요청 (공개)
+        if ("POST".equals(method)) {
+            if (AccountApi.PUBLIC_POST_PATHS.contains(requestURI)) {
+                return true;
+            }
+        }
 
-        // // GET 요청만 공개
-        // // Todo: api 경로 맞게 수정
-        // if ("GET".equals(method)) {
-        //     // 정확한 경로 매칭
-        //     if (requestURI.equals("/event/events") ||
-        //         requestURI.equals("/event/events/open-today") ||
-        //         requestURI.equals("/event/events/to-be-opened")) {
-        //         return true;
-        //     }
+        // GET 요청만 공개
+        if ("GET".equals(method)) {
+            if (EventApi.PUBLIC_GET_EXACT_PATHS.contains(requestURI)) {
+                return true;
+            }
 
-        //     // 쿼리 파라미터가 있는 경로
-        //     if (requestURI.startsWith("/events?") ||
-        //         requestURI.startsWith("/seats?")) {
-        //         return true;
-        //     }
+            // 쿼리 파라미터가 있는 경로
+            if (EventApi.PUBLIC_GET_PREFIX_PATHS.stream().anyMatch(requestURI::startsWith)) {
+                return true;
+            }
 
-        //     // 동적 경로 패턴
-        //     if (pathMatcher.match("/events/*", requestURI)) {
-        //         return true;
-        //     }
+            // 동적 경로 패턴
+            if (EventApi.PUBLIC_GET_PATTERN_PATHS.stream().anyMatch(pattern -> pathMatcher.match(pattern, requestURI))) {
+                return true;
+            }
+        }
 
-        //     if (pathMatcher.match("/event-schedules/*", requestURI)) {
-        //         return true;
-        //     }
-        // }
-
-        // return false; // 기타 모든 요청은 인증 필요
+        return false; // 기타 모든 요청은 인증 필요
     }
 }
