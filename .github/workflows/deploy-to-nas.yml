@@ -80,7 +80,7 @@ jobs:
               --restart unless-stopped \
               -e SPRING_PROFILES_ACTIVE=dev \
               -v /volume1/docker/pyokemon/gateway-service/logs:/app/logs \
-              -p 8086:8086 \
+              -p 8087:8087 \
               --network pyokemon-network \
               ghcr.io/team-otwo/pyokemon-gateway-service/gateway-service:latest
 
