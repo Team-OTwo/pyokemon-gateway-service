@@ -26,7 +26,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final List<String> STATIC_PUBLIC_PATHS = Arrays.asList(
         "/health",
         "/actuator",
-        "/api/gateway/v1"
+        "/api/gateway/v1",
+        "/actuator/prometheus"
     );
 
     @Override
