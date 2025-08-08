@@ -1,5 +1,5 @@
 server:
-  port: 8086
+  port: 8087
   
 spring:
   application:
@@ -15,8 +15,8 @@ spring:
             uri: http://localhost:8080
             filters:
               # 임시로 인증 헤더 필터 제거
-              # - AddAuthenticationHeader
-              # - RewritePath=/account/(?<segment>.*), /account/api/$\{segment}
+               - AddAuthenticationHeader
+               # - RewritePath=/account/(?<segment>.*), /account/api/$\{segment}
             
           # Event 서비스 라우팅  
           - id: event-service
@@ -25,8 +25,8 @@ spring:
             uri: http://localhost:8081
             filters:
               # 임시로 인증 헤더 필터 제거
-              # - AddAuthenticationHeader
-              # - RewritePath=/event/(?<segment>.*), /event/api/$\{segment}
+               - AddAuthenticationHeader
+               # - RewritePath=/event/(?<segment>.*), /event/api/$\{segment}
               
           # Payment 서비스 라우팅
           - id: payment-service
@@ -34,62 +34,50 @@ spring:
               - Path=/payment/**
             uri: http://localhost:8082
             filters:
-              # - AddAuthenticationHeader
-              # - RewritePath=/payment/(?<segment>.*), /payment/api/$\{segment}
+               - AddAuthenticationHeader
+               # - RewritePath=/payment/(?<segment>.*), /payment/api/$\{segment}
               
           # DID 서비스 라우팅
           - id: did-service
             predicates:
               - Path=/did/**
-            uri: http://localhost:8083
+            uri: http://localhost:8084
             filters:
-              # - AddAuthenticationHeader
-              # - RewritePath=/did/(?<segment>.*), /did/api/$\{segment}
+               - AddAuthenticationHeader
+               # - RewritePath=/did/(?<segment>.*), /did/api/$\{segment}
               
           # Notification 서비스 라우팅
           - id: noti-service
             predicates:
               - Path=/noti/**
-            uri: http://localhost:8084
+            uri: http://localhost:8085
             filters:
-              # - AddAuthenticationHeader
-              # - RewritePath=/noti/(?<segment>.*), /noti/api/$\{segment}
+               - AddAuthenticationHeader
+               # - RewritePath=/noti/(?<segment>.*), /noti/api/$\{segment}
               
           # BFF 서비스 라우팅
           - id: bff-service
             predicates:
               - Path=/bff/**
-            uri: http://localhost:8085
+            uri: http://localhost:8086
             filters:
-              # - AddAuthenticationHeader
+              - AddAuthenticationHeader
               # - RewritePath=/bff/(?<segment>.*), /bff/api/$\{segment}
-      # Gateway CORS 설정
-      default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin Access-Control-Allow-Methods Access-Control-Allow-Headers Access-Control-Expose-Headers Vary, RETAIN_FIRST
-      globalcors:
-        add-to-simple-url-handler-mapping: true
-        cors-configurations:
-          '[/**]':
-            allowed-origins:
-              - "http://localhost:5173"
-              - "https://pyokemon.synology.me"
-              - "http://pyokemon.synology.me"
-            allowed-methods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-            allowed-headers: "*"
-            exposed-headers: "Authorization,Content-Disposition"
-            allow-credentials: false
-            max-age: 3600
+
+          # Booking 서비스 라우팅
+          - id: booking-service
+            predicates:
+              - Path=/booking/**
+            uri: http://localhost:8088
+            filters:
+            - AddAuthenticationHeader
+            # - RewritePath=/bff/(?<segment>.*), /bff/api/$\{segment}
 
 jwt:
   header: Authorization
   secretKey: cHlva2Vtb24tYWNjb3VudC1qd3Qtc2VjcmV0LWtleS0yMDI0LXZlcnktbG9uZy1zZWNyZXQta2V5LWZvci1zZWN1cml0eQ==
-  expiresIn: 86400000
-  mobileExpiresIn: 86400000
+  expiresIn: 1800000
+  mobileExpiresIn: 604800000
 
 logging:
   level:
