@@ -54,7 +54,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         );
 
         public static final List<String> PUBLIC_GET_PATTERN_PATHS = Arrays.asList(
-                "/event/api/events/*",
                 "/event/api/event-schedules/*"
         );
     }

@@ -88,8 +88,6 @@ public class WebSecurityConfig {
                 "/event/api/events",
                 "/event/api/events/open-today",
                 "/event/api/events/to-be-opened",
-                "/event/api/events/**",
-                "/event/api/event-schedules/**",
                 "/event/api/seats"
         };
     }
