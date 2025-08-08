@@ -40,25 +40,15 @@ public class WebSecurityConfig {
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenValidator), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(registry -> registry
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/gateway/v1/**").permitAll()
-                        .requestMatchers(
-                                "/account/api/login",
-                                "/account/api/app/login",
-                                "/account/api/users"
-                        ).permitAll()
-                        .requestMatchers(
-                                "/event/api/events",
-                                "/event/api/events/open-today",
-                                "/event/api/events/to-be-opened"
-                        ).permitAll()
-                        .requestMatchers("/event/api/events/**").permitAll()
-                        .requestMatchers("/event/api/event-schedules/**").permitAll()
-                        .requestMatchers("/event/api/seats").permitAll()
-                        .requestMatchers(
-                                "/health/**",
-                                "/actuator/**",
-                                "/actuator/health/**"
-                        ).permitAll()
+                        // Account Api 허용
+                        .requestMatchers(AccountApi.PERMIT_ALL).permitAll()
+                        // Event Api 허용
+                        .requestMatchers(EventApi.PERMIT_ALL).permitAll()
+                        // System Api 허용
+                        .requestMatchers(SystemApi.PERMIT_ALL).permitAll()
+                        // Gateway Api 허용
+                        .requestMatchers(GatewayApi.PERMIT_ALL).permitAll()
+                        // 나머지 요청은 인증 필요
                         .anyRequest().authenticated()
                 );
         return http.build();
@@ -81,5 +71,42 @@ public class WebSecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    // 계정 관련 허용 엔드포인트
+    public static class AccountApi {
+        public static final String[] PERMIT_ALL = {
+                "/account/api/login",
+                "/account/api/app/login",
+                "/account/api/users"
+        };
+    }
+
+    // 이벤트 관련 허용 엔드포인트
+    public static class EventApi {
+        public static final String[] PERMIT_ALL = {
+                "/event/api/events",
+                "/event/api/events/open-today",
+                "/event/api/events/to-be-opened",
+                "/event/api/events/**",
+                "/event/api/event-schedules/**",
+                "/event/api/seats"
+        };
+    }
+
+    // 시스템 헬스체크 관련 허용 엔드포인트
+    public static class SystemApi {
+        public static final String[] PERMIT_ALL = {
+                "/health/**",
+                "/actuator/**",
+                "/actuator/health/**"
+        };
+    }
+
+    // 게이트웨이 관련 허용 엔드포인트
+    public static class GatewayApi {
+        public static final String[] PERMIT_ALL = {
+                "/api/gateway/v1/**"
+        };
     }
 }
