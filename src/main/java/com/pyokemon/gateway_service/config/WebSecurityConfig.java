@@ -70,6 +70,7 @@ public class WebSecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
         configuration.addAllowedOrigin("http://localhost:5173");
+        configuration.addAllowedOrigin("http://localhost:6080");
         configuration.addAllowedOrigin("https://pyokemon.synology.me");
         configuration.addAllowedOrigin("http://pyokemon.synology.me");
         configuration.addAllowedHeader("*");
