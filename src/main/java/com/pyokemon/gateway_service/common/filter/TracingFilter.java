@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import io.micrometer.tracing.Tracer;
 import io.micrometer.tracing.Span;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -18,6 +20,7 @@ import java.io.IOException;
  */
 @Slf4j
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE)  // 가장 먼저 실행
 @RequiredArgsConstructor
 public class TracingFilter extends OncePerRequestFilter {
 
@@ -58,7 +61,7 @@ public class TracingFilter extends OncePerRequestFilter {
                     response.addHeader("X-Trace-Id", traceId);
                 }
                 
-                log.info("요청 종료: [trace_id={}] [span_id={}] {} {} - {}",
+                log.info("요청 종료: [trace_id={}] [span_id={}] {} {} - {}", 
                         traceId, spanId, request.getMethod(), request.getRequestURI(), response.getStatus());
             } else {
                 log.info("요청 종료: [trace 없음] {} {} - {}", 
