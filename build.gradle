@@ -40,8 +40,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 	
 	// Micrometer Tracing
-	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+	// Brave 추적 라이브러리 제외
+	// implementation 'io.micrometer:micrometer-tracing-bridge-brave'
 	implementation 'io.github.openfeign:feign-micrometer'
+	
+	// Tempo 익스포터
+	implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+	implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
 	
 	// AspectJ 의존성 추가
 	implementation 'org.springframework.boot:spring-boot-starter-aop'

@@ -8,19 +8,26 @@ server:
     client-auth: none
 
 management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,prometheus
-  prometheus:
-    metrics:
-      export:
-        enabled: true
   tracing:
     sampling:
       probability: 1.0
     propagation:
       type: w3c
+    otlp:
+      endpoint: http://tempo:4317
+    enabled: true
+  otlp:
+    tracing:
+      endpoint: http://tempo:4317
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
 
 logging:
   level:
