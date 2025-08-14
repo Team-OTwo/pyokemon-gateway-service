@@ -82,7 +82,8 @@ jwt:
 logging:
   level:
     root: info
-    com.pyokemon.gateway_service: info
+    com.pyokemon: info
+  config: classpath:log4j2.yml
     
 ---
 spring:
