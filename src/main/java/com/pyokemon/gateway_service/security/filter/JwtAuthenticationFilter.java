@@ -63,13 +63,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String requestURI = request.getRequestURI();
-        String requestMethod = request.getMethod();
-
-        if (isPublicPath(requestURI, requestMethod)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+//        String requestURI = request.getRequestURI();
+//        String requestMethod = request.getMethod();
+//
+//        if (isPublicPath(requestURI, requestMethod)) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
 
         try {
             String jwtToken = jwtTokenValidator.getToken(request);
@@ -94,40 +94,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private boolean isPublicPath(String requestURI, String method) {
-
-        // 임시로 모든 API 인증 해제
-        //return true;
-        
-        // 정적 공개 경로들
-        if (STATIC_PUBLIC_PATHS.stream().anyMatch(requestURI::startsWith)) {
-            return true;
-        }
-
-        // 로그인 관련 POST 요청 (공개)
-        if ("POST".equals(method)) {
-            if (AccountApi.PUBLIC_POST_PATHS.contains(requestURI)) {
-                return true;
-            }
-        }
-
-        // GET 요청만 공개
-        if ("GET".equals(method)) {
-            if (EventApi.PUBLIC_GET_EXACT_PATHS.contains(requestURI)) {
-                return true;
-            }
-
-            // 쿼리 파라미터가 있는 경로
-            if (EventApi.PUBLIC_GET_PREFIX_PATHS.stream().anyMatch(requestURI::startsWith)) {
-                return true;
-            }
-
-            // 동적 경로 패턴
-            if (EventApi.PUBLIC_GET_PATTERN_PATHS.stream().anyMatch(pattern -> pathMatcher.match(pattern, requestURI))) {
-                return true;
-            }
-        }
-
-        return false; // 기타 모든 요청은 인증 필요
-    }
+//    private boolean isPublicPath(String requestURI, String method) {
+//
+//        // 임시로 모든 API 인증 해제
+//        //return true;
+//
+//        // 정적 공개 경로들
+//        if (STATIC_PUBLIC_PATHS.stream().anyMatch(requestURI::startsWith)) {
+//            return true;
+//        }
+//
+//        // 로그인 관련 POST 요청 (공개)
+//        if ("POST".equals(method)) {
+//            if (AccountApi.PUBLIC_POST_PATHS.contains(requestURI)) {
+//                return true;
+//            }
+//        }
+//
+//        // GET 요청만 공개
+//        if ("GET".equals(method)) {
+//            if (EventApi.PUBLIC_GET_EXACT_PATHS.contains(requestURI)) {
+//                return true;
+//            }
+//
+//            // 쿼리 파라미터가 있는 경로
+//            if (EventApi.PUBLIC_GET_PREFIX_PATHS.stream().anyMatch(requestURI::startsWith)) {
+//                return true;
+//            }
+//
+//            // 동적 경로 패턴
+//            if (EventApi.PUBLIC_GET_PATTERN_PATHS.stream().anyMatch(pattern -> pathMatcher.match(pattern, requestURI))) {
+//                return true;
+//            }
+//        }
+//
+//        return false; // 기타 모든 요청은 인증 필요
+//    }
 }
