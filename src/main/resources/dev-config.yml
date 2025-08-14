@@ -34,7 +34,7 @@ spring:
             uri: http://account-service:8080
             filters:
             # 임시로 인증 헤더 필터 제거
-            # - AddAuthenticationHeader
+            - AddAuthenticationHeader
             # - RewritePath=/account/(?<segment>.*), /account/api/$\{segment}
 
           # Event 서비스 라우팅
@@ -44,7 +44,7 @@ spring:
             uri: http://event-service:8081
             filters:
             # 임시로 인증 헤더 필터 제거
-            # - AddAuthenticationHeader
+            - AddAuthenticationHeader
             # - RewritePath=/event/(?<segment>.*), /event/api/$\{segment}
 
           # Payment 서비스 라우팅
@@ -53,32 +53,41 @@ spring:
               - Path=/payment/**
             uri: http://payment-service:8082
             filters:
-            # - AddAuthenticationHeader
+            - AddAuthenticationHeader
             # - RewritePath=/payment/(?<segment>.*), /payment/api/$\{segment}
 
           # DID 서비스 라우팅
           - id: did-service
             predicates:
               - Path=/did/**
-            uri: http://did-service:8083
+            uri: http://did-service:8084
             filters:
-            # - AddAuthenticationHeader
+            - AddAuthenticationHeader
             # - RewritePath=/did/(?<segment>.*), /did/api/$\{segment}
 
           # Notification 서비스 라우팅
           - id: noti-service
             predicates:
               - Path=/noti/**
-            uri: http://noti-service:8084
+            uri: http://noti-service:8085
             filters:
-            # - AddAuthenticationHeader
+            - AddAuthenticationHeader
             # - RewritePath=/noti/(?<segment>.*), /noti/api/$\{segment}
 
           # BFF 서비스 라우팅
           - id: bff-service
             predicates:
               - Path=/bff/**
-            uri: http://bff-service:8085
+            uri: http://bff-service:8086
             filters:
-            # - AddAuthenticationHeader
+            - AddAuthenticationHeader
+            # - RewritePath=/bff/(?<segment>.*), /bff/api/$\{segment}
+
+          # Booking 서비스 라우팅
+          - id: booking-service
+            predicates:
+              - Path=/booking/**
+            uri: http://localhost:8088
+            filters:
+              - AddAuthenticationHeader
             # - RewritePath=/bff/(?<segment>.*), /bff/api/$\{segment}
