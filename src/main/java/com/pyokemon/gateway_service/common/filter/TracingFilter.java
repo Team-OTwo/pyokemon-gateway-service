@@ -15,12 +15,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/**
- * 모든 요청에 대해 traceId를 생성하고 MDC에 설정하는 필터
- */
 @Slf4j
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE)  // 가장 먼저 실행
+@Order(Ordered.HIGHEST_PRECEDENCE)  
 @RequiredArgsConstructor
 public class TracingFilter extends OncePerRequestFilter {
 
@@ -33,39 +30,22 @@ public class TracingFilter extends OncePerRequestFilter {
         // 현재 활성화된 span 정보 가져오기
         Span currentSpan = tracer.currentSpan();
         
-        // 요청 시작시 로그 기록
         if (currentSpan != null) {
             String traceId = currentSpan.context().traceId();
-            String spanId = currentSpan.context().spanId();
             
-            // 헤더에 traceId 추가 (클라이언트 응답용)
             response.addHeader("X-Trace-Id", traceId);
-            
-            log.info("요청 시작: [trace_id={}] [span_id={}] {} {}", 
-                    traceId, spanId, request.getMethod(), request.getRequestURI());
-        } else {
-            log.info("요청 시작: [trace 없음] {} {}", request.getMethod(), request.getRequestURI());
-        }
-        
+        } 
+
         try {
-            // 다음 필터 실행
             filterChain.doFilter(request, response);
         } finally {
-            // 요청 종료시 로그 기록
             if (currentSpan != null) {
                 String traceId = currentSpan.context().traceId();
-                String spanId = currentSpan.context().spanId();
                 
-                // 응답에도 traceId 확실히 추가 (필터 체인 실행 후에도 유지되도록)
                 if (!response.containsHeader("X-Trace-Id")) {
                     response.addHeader("X-Trace-Id", traceId);
                 }
                 
-                log.info("요청 종료: [trace_id={}] [span_id={}] {} {} - {}", 
-                        traceId, spanId, request.getMethod(), request.getRequestURI(), response.getStatus());
-            } else {
-                log.info("요청 종료: [trace 없음] {} {} - {}", 
-                        request.getMethod(), request.getRequestURI(), response.getStatus());
             }
         }
     }
