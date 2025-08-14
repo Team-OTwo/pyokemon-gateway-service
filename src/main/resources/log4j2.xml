@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="INFO">
     <Properties>
-        <Property name="log-pattern">[%d{yyyy-MM-dd HH:mm:ss.SSS}:%-3relative] [%highlight{%-5level}{FATAL=red, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=blue}] [%40logger{0}:%-5L] [%X{spanId}] - %highlight{%msg%n}</Property>
+        <Property name="log-pattern">[%d{yyyy-MM-dd HH:mm:ss.SSS}:%-3relative] [%highlight{%-5level}{FATAL=red, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=blue}] [%40logger{0}:%-5L] [trace_id=%X{traceId}] [span_id=%X{spanId}] - %highlight{%msg%n}</Property>
         <Property name="log-path">/app/logs</Property>
         <Property name="service-name">gateway-service</Property>
     </Properties>
@@ -14,7 +14,10 @@
         <RollingFile name="JsonFile" 
                      fileName="${log-path}/${service-name}.log" 
                      filePattern="${log-path}/${service-name}-%d{yyyy-MM-dd}-%i.log">
-            <JSONLayout compact="true" eventEol="true" properties="true" stacktraceAsString="true"/>
+            <JSONLayout compact="true" eventEol="true" properties="true" stacktraceAsString="true">
+                <KeyValuePair key="trace_id" value="${ctx:traceId}"/>
+                <KeyValuePair key="span_id" value="${ctx:spanId}"/>
+            </JSONLayout>
             <Policies>
                 <SizeBasedTriggeringPolicy size="10MB"/>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>

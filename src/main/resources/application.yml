@@ -1,5 +1,5 @@
 server:
-  port: 18087
+  port: 8087
   
 spring:
   application:
@@ -78,6 +78,17 @@ jwt:
   secretKey: cHlva2Vtb24tYWNjb3VudC1qd3Qtc2VjcmV0LWtleS0yMDI0LXZlcnktbG9uZy1zZWNyZXQta2V5LWZvci1zZWN1cml0eQ==
   expiresIn: 1800000
   mobileExpiresIn: 604800000
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      type: w3c
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
 
 logging:
   level:
