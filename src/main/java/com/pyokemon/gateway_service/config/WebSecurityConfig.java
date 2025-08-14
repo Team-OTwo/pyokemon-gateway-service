@@ -65,7 +65,13 @@ public class WebSecurityConfig {
         configuration.addAllowedOrigin("http://pyokemon.synology.me");
         configuration.addAllowedHeader("*");
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Disposition", "X-Auth-accountId", "X-Auth-Role"));
+        configuration.setExposedHeaders(Arrays.asList(
+                "Authorization", 
+                "Content-Disposition", 
+                "X-Auth-accountId", 
+                "X-Auth-Role",
+                "X-Trace-Id"  // Trace ID 추가
+        ));
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

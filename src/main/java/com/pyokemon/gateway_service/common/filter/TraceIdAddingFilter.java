@@ -34,16 +34,26 @@ public class TraceIdAddingFilter extends OncePerRequestFilter {
             String traceId = currentSpan.context().traceId();
             String spanId = currentSpan.context().spanId();
             
-            // 표준 W3C 헤더 추가
+            // 표준 W3C 헤더 추가 (서비스 간 전파)
             response.addHeader("traceparent", "00-" + traceId + "-" + spanId + "-01");
             
             // 커스텀 헤더 추가 (서비스간 호환성을 위해)
             response.addHeader("X-B3-TraceId", traceId);
             response.addHeader("X-B3-SpanId", spanId);
             
+            // 클라이언트용 응답 헤더 추가
+            response.addHeader("X-Trace-Id", traceId);
+            
             log.debug("Trace headers added: traceId={}, spanId={}", traceId, spanId);
         }
         
-        filterChain.doFilter(request, response);
+        try {
+            filterChain.doFilter(request, response);
+        } finally {
+            // 필터 체인이 모두 실행된 후에도 X-Trace-Id 헤더가 확실히 포함되어 있도록 한 번 더 확인
+            if (currentSpan != null && !response.containsHeader("X-Trace-Id")) {
+                response.addHeader("X-Trace-Id", currentSpan.context().traceId());
+            }
+        }
     }
 } 

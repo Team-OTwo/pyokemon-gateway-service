@@ -7,12 +7,26 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.Arrays;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    // CORS 설정은 WebSecurityConfig에서 완전히 처리
+    // CORS 설정은 WebSecurityConfig에서 완전히 처리하지만, X-Trace-Id 헤더 노출을 위해 추가
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.addExposedHeader("X-Trace-Id");
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
     
     @Bean
     public FilterRegistrationBean<TracingFilter> tracingFilter(TracingFilter tracingFilter) {

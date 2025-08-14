@@ -35,7 +35,7 @@ public class TracingFilter extends OncePerRequestFilter {
             String traceId = currentSpan.context().traceId();
             String spanId = currentSpan.context().spanId();
             
-            // 헤더에 traceId 추가 (다른 서비스로 전파할 때 사용)
+            // 헤더에 traceId 추가 (클라이언트 응답용)
             response.addHeader("X-Trace-Id", traceId);
             
             log.info("요청 시작: [trace_id={}] [span_id={}] {} {}", 
@@ -50,12 +50,16 @@ public class TracingFilter extends OncePerRequestFilter {
         } finally {
             // 요청 종료시 로그 기록
             if (currentSpan != null) {
+                String traceId = currentSpan.context().traceId();
+                String spanId = currentSpan.context().spanId();
+                
+                // 응답에도 traceId 확실히 추가 (필터 체인 실행 후에도 유지되도록)
+                if (!response.containsHeader("X-Trace-Id")) {
+                    response.addHeader("X-Trace-Id", traceId);
+                }
+                
                 log.info("요청 종료: [trace_id={}] [span_id={}] {} {} - {}",
-                        currentSpan.context().traceId(),
-                        currentSpan.context().spanId(),
-                        request.getMethod(),
-                        request.getRequestURI(),
-                        response.getStatus());
+                        traceId, spanId, request.getMethod(), request.getRequestURI(), response.getStatus());
             } else {
                 log.info("요청 종료: [trace 없음] {} {} - {}", 
                         request.getMethod(), request.getRequestURI(), response.getStatus());
