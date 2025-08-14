@@ -20,7 +20,7 @@ management:
 logging:
   level:
     com.pyokemon: DEBUG
-  config: classpath:log4j2.yml
+  config: classpath:log4j2.xml
 
 spring:
   cloud:

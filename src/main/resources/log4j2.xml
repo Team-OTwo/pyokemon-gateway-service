@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Properties>
+        <Property name="log-pattern">[%d{yyyy-MM-dd HH:mm:ss.SSS}:%-3relative] [%highlight{%-5level}{FATAL=red, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue, TRACE=blue}] [%40logger{0}:%-5L] [%X{spanId}] - %highlight{%msg%n}</Property>
+        <Property name="log-path">/app/logs</Property>
+        <Property name="service-name">gateway-service</Property>
+    </Properties>
+    
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${log-pattern}" disableAnsi="false"/>
+        </Console>
+        
+        <RollingFile name="JsonFile" 
+                     fileName="${log-path}/${service-name}.log" 
+                     filePattern="${log-path}/${service-name}-%d{yyyy-MM-dd}-%i.log">
+            <JSONLayout compact="true" eventEol="true" properties="true" stacktraceAsString="true"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30">
+                <Delete basePath="${log-path}" maxDepth="1">
+                    <IfFileName glob="${service-name}-*.log"/>
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+    
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="JsonFile" level="DEBUG"/>
+        </Root>
+        <Logger name="com.pyokemon" level="DEBUG"/>
+        <Logger name="org.springframework" level="INFO"/>
+    </Loggers>
+</Configuration> 
