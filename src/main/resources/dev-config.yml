@@ -97,7 +97,7 @@ spring:
           - id: booking-service
             predicates:
               - Path=/booking/**
-            uri: http://localhost:8088
+            uri: http://booking-service:8088
             filters:
               - AddAuthenticationHeader
             # - RewritePath=/bff/(?<segment>.*), /bff/api/$\{segment}
