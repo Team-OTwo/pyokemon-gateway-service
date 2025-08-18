@@ -14,11 +14,9 @@ management:
     propagation:
       type: w3c
     otlp:
-      endpoint: http://tempo:4317
+      endpoint: http://tempo:4318/v1/traces 
+      protocol: http/protobuf 
     enabled: true
-  otlp:
-    tracing:
-      endpoint: http://tempo:4317
   metrics:
     export:
       prometheus:
