@@ -47,9 +47,9 @@ spring:
                # - RewritePath=/did/(?<segment>.*), /did/api/$\{segment}
               
           # Notification 서비스 라우팅
-          - id: noti-service
+          - id: notification-service
             predicates:
-              - Path=/noti/**
+              - Path=/notification/**
             uri: http://localhost:8085
             filters:
                - AddAuthenticationHeader

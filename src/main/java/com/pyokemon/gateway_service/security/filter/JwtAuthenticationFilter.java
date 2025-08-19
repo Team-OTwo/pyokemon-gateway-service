@@ -20,43 +20,43 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenValidator jwtTokenValidator;
-    private final AntPathMatcher pathMatcher = new AntPathMatcher();
-
-    // 정적 공개 경로들
-    private static final List<String> STATIC_PUBLIC_PATHS = Arrays.asList(
-        "/health",
-        "/actuator",
-        "/api/gateway/v1",
-        "/actuator/prometheus"
-    );
-
-    // 계정 관련 공개 경로
-    public static class AccountApi {
-        public static final List<String> PUBLIC_POST_PATHS = Arrays.asList(
-                "/account/api/login",
-                "/account/api/app/login",
-                "/account/api/users",
-                "/account/api/tenants"
-        );
-    }
-
-    // 이벤트 관련 공개 경로
-    public static class EventApi {
-        public static final List<String> PUBLIC_GET_EXACT_PATHS = Arrays.asList(
-                "/event/api/events",
-                "/event/api/events/open-today",
-                "/event/api/events/to-be-opened"
-        );
-
-        public static final List<String> PUBLIC_GET_PREFIX_PATHS = Arrays.asList(
-                "/event/api/events?",
-                "/event/api/seats?"
-        );
-
-        public static final List<String> PUBLIC_GET_PATTERN_PATHS = Arrays.asList(
-                "/event/api/event-schedules/*"
-        );
-    }
+//    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+//
+//    // 정적 공개 경로들
+//    private static final List<String> STATIC_PUBLIC_PATHS = Arrays.asList(
+//        "/health",
+//        "/actuator",
+//        "/api/gateway/v1",
+//        "/actuator/prometheus"
+//    );
+//
+//    // 계정 관련 공개 경로
+//    public static class AccountApi {
+//        public static final List<String> PUBLIC_POST_PATHS = Arrays.asList(
+//                "/account/api/login",
+//                "/account/api/app/login",
+//                "/account/api/users",
+//                "/account/api/tenants"
+//        );
+//    }
+//
+//    // 이벤트 관련 공개 경로
+//    public static class EventApi {
+//        public static final List<String> PUBLIC_GET_EXACT_PATHS = Arrays.asList(
+//                "/event/api/events",
+//                "/event/api/events/open-today",
+//                "/event/api/events/to-be-opened"
+//        );
+//
+//        public static final List<String> PUBLIC_GET_PREFIX_PATHS = Arrays.asList(
+//                "/event/api/events?",
+//                "/event/api/seats?"
+//        );
+//
+//        public static final List<String> PUBLIC_GET_PATTERN_PATHS = Arrays.asList(
+//                "/event/api/event-schedules/*"
+//        );
+//    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
