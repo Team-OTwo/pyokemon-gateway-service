@@ -1,8 +1,10 @@
 package com.pyokemon.gateway_service.config;
 
 
+import com.pyokemon.gateway_service.common.constant.ApiPermitConstants;
 import com.pyokemon.gateway_service.security.filter.JwtAuthenticationFilter;
 import com.pyokemon.gateway_service.security.jwt.JwtTokenValidator;
+import com.pyokemon.gateway_service.common.constant.ApiPermitConstants.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 
 import java.util.Arrays;
 
@@ -79,39 +82,39 @@ public class WebSecurityConfig {
         return source;
     }
 
-    // 계정 관련 허용 엔드포인트
-    public static class AccountApi {
-        public static final String[] PERMIT_ALL = {
-                "/account/api/login",
-                "/account/api/app/login",
-                "/account/api/users"
-        };
-    }
-
-    // 이벤트 관련 허용 엔드포인트
-    public static class EventApi {
-        public static final String[] PERMIT_ALL = {
-                "/event/api/events",
-                "/event/api/events/open-today",
-                "/event/api/events/to-be-opened",
-                "/event/api/seats",
-                "/event/api/events/*"
-        };
-    }
-
-    // 시스템 헬스체크 관련 허용 엔드포인트
-    public static class SystemApi {
-        public static final String[] PERMIT_ALL = {
-                "/health/**",
-                "/actuator/**",
-                "/actuator/health/**"
-        };
-    }
-
-    // 게이트웨이 관련 허용 엔드포인트
-    public static class GatewayApi {
-        public static final String[] PERMIT_ALL = {
-                "/api/gateway/v1/**"
-        };
-    }
+//    // 계정 관련 허용 엔드포인트
+//    public static class AccountApi {
+//        public static final String[] PERMIT_ALL = {
+//                "/account/api/login",
+//                "/account/api/app/login",
+//                "/account/api/users"
+//        };
+//    }
+//
+//    // 이벤트 관련 허용 엔드포인트
+//    public static class EventApi {
+//        public static final String[] PERMIT_ALL = {
+//                "/event/api/events",
+//                "/event/api/events/open-today",
+//                "/event/api/events/to-be-opened",
+//                "/event/api/seats",
+//                "/event/api/events/*"
+//        };
+//    }
+//
+//    // 시스템 헬스체크 관련 허용 엔드포인트
+//    public static class SystemApi {
+//        public static final String[] PERMIT_ALL = {
+//                "/health/**",
+//                "/actuator/**",
+//                "/actuator/health/**"
+//        };
+//    }
+//
+//    // 게이트웨이 관련 허용 엔드포인트
+//    public static class GatewayApi {
+//        public static final String[] PERMIT_ALL = {
+//                "/api/gateway/v1/**"
+//        };
+//    }
 }
