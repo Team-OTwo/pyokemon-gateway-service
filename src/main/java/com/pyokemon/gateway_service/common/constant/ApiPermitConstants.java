@@ -11,7 +11,8 @@ public final class ApiPermitConstants {
         public static final String[] PERMIT_ALL = {
                 "/account/api/login",
                 "/account/api/app/login",
-                "/account/api/users"
+                "/account/api/users",
+                "/account/api/users/check-duplicate"
         };
     }
 
