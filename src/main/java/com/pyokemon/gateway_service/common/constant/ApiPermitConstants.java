@@ -12,7 +12,8 @@ public final class ApiPermitConstants {
                 "/account/api/login",
                 "/account/api/app/login",
                 "/account/api/users",
-                "/account/api/users/check-duplicate"
+                "/account/api/users/check-duplicate",
+                "/account/api/users/notification"
         };
     }
 
