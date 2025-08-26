@@ -34,53 +34,38 @@ public class JwtTokenValidator {
 
     public JwtAuthentication validateToken(String token) {
         try {
-            final Claims claims = this.verifyAndGetClaims(token);
-            if (claims == null) {
-                return null;
-            }
-            
-            Date expirationDate = claims.getExpiration();
-            if (expirationDate == null || expirationDate.before(new Date())) {
-                return null;
-            }
-            
-            String subject = claims.getSubject();
-            String role = claims.get("role", String.class);
-            
-            if (subject == null || subject.trim().isEmpty()) {
-                return null;
-            }
-            
-            Long accountId;
-            try {
-                accountId = Long.parseLong(subject);
-            } catch (NumberFormatException e) {
-                return null;
-            }
-            
-            UserPrincipal principal = new UserPrincipal(accountId, role);
-            
-            JwtAuthentication authentication = new JwtAuthentication(principal, token);
-            
-            return authentication;
-            
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private Claims verifyAndGetClaims(String token) {
-        Claims claims;
-        try {
-            claims = Jwts.parser()
+            final Claims claims = Jwts.parser()
                     .verifyWith(getSecretKey())
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
+
+            String subject = claims.getSubject();
+            String role = claims.get("role", String.class);
+
+            if (subject == null || subject.trim().isEmpty()) {
+                log.warn("Invalid JWT: Subject is null or empty.");
+                return null;
+            }
+
+            Long accountId;
+            try {
+                accountId = Long.parseLong(subject);
+            } catch (NumberFormatException e) {
+                log.warn("Invalid JWT: Subject is not a valid Long.");
+                return null;
+            }
+
+            UserPrincipal principal = new UserPrincipal(accountId, role);
+            return new JwtAuthentication(principal, token);
+
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            log.warn("Expired JWT token: {}", e.getMessage());
+            throw e;
         } catch (Exception e) {
-            claims = null;
+            log.error("Invalid JWT token processing error", e);
+            return null;
         }
-        return claims;
     }
 
     public String getToken(HttpServletRequest request) {
