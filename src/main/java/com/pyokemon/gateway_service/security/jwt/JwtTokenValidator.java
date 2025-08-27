@@ -42,6 +42,8 @@ public class JwtTokenValidator {
 
             String subject = claims.getSubject();
             String role = claims.get("role", String.class);
+            // Todo : claim get deviceId, 없으면 그냥 진행 있으면 헤더 추가
+            Long deviceId = claims.get("deviceId", Long.class);
 
             if (subject == null || subject.trim().isEmpty()) {
                 log.warn("Invalid JWT: Subject is null or empty.");
@@ -56,7 +58,7 @@ public class JwtTokenValidator {
                 return null;
             }
 
-            UserPrincipal principal = new UserPrincipal(accountId, role);
+            UserPrincipal principal = new UserPrincipal(accountId, role, deviceId);
             return new JwtAuthentication(principal, token);
 
         } catch (io.jsonwebtoken.ExpiredJwtException e) {

@@ -11,6 +11,7 @@ import java.util.Objects;
 public class UserPrincipal implements Principal {
     private final Long accountId;
     private final String role;
+    private final Long deviceId;
 
     public boolean hasName() {
         return accountId != null;
@@ -92,6 +93,7 @@ public class UserPrincipal implements Principal {
     public static class Builder {
         private Long accountId;
         private String role;
+        private Long deviceId;
         
         public Builder accountId(Long accountId) {
             this.accountId = accountId;
@@ -102,12 +104,17 @@ public class UserPrincipal implements Principal {
             this.role = role;
             return this;
         }
+
+        public Builder deviceId(Long deviceId) {
+            this.deviceId = deviceId;
+            return this;
+        }
         
         public UserPrincipal build() {
             if (accountId == null) {
                 throw new IllegalArgumentException("accountId cannot be null");
             }
-            return new UserPrincipal(accountId, role);
+            return new UserPrincipal(accountId, role, deviceId);
         }
     }
     
