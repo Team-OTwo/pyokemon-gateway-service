@@ -37,6 +37,13 @@ class AuthenticationHeaderFilterFunction {
                     } else {
                         log.warn("UserPrincipal의 role이 null입니다");
                     }
+
+                    if (userPrincipal.getDeviceId() != null) {
+                        requestBuilder.header("X-Auth-DeviceId", userPrincipal.getDeviceId().toString());
+                        log.info("X-Auth-DeviceId 헤더 추가됨: {}", userPrincipal.getDeviceId());
+                    } else {
+                        log.warn("UserPrincipal의 deviceId가 null입니다");
+                    }
                 } else {
                     log.warn("Principal이 UserPrincipal이 아닙니다. Principal: {}", principal);
                 }
