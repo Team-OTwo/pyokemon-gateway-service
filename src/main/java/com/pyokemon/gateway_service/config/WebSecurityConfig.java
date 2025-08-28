@@ -47,6 +47,8 @@ public class WebSecurityConfig {
                         .requestMatchers(AccountApi.PERMIT_ALL).permitAll()
                         // Event Api 허용
                         .requestMatchers(EventApi.PERMIT_ALL).permitAll()
+                        // Payment Api 허용
+                        .requestMatchers(PaymentApi.PERMIT_ALL).permitAll()
                         // System Api 허용
                         .requestMatchers(SystemApi.PERMIT_ALL).permitAll()
                         // Gateway Api 허용

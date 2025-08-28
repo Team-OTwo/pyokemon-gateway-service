@@ -35,6 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             ApiPermitConstants.EventApi.PERMIT_ALL,
             ApiPermitConstants.SystemApi.PERMIT_ALL,
             ApiPermitConstants.GatewayApi.PERMIT_ALL,
+            ApiPermitConstants.PaymentApi.PERMIT_ALL,
             new String[]{"/favicon.ico"} // Add other specific paths if needed
     ).flatMap(Arrays::stream).toList();
 
