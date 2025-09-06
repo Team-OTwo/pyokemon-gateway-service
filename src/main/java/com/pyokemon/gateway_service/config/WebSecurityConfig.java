@@ -42,6 +42,7 @@ public class WebSecurityConfig {
                 .x509(AbstractHttpConfigurer::disable)
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenValidator), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(registry -> registry
+                        .requestMatchers("/did/backend/**").denyAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // Account Api 허용
                         .requestMatchers(AccountApi.PERMIT_ALL).permitAll()
