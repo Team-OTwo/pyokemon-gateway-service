@@ -43,16 +43,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        if (isPublicPath(request.getRequestURI())) {
+            String jwtToken = jwtTokenValidator.getToken(request);
+            if (jwtToken != null) {
+                try {
+                    JwtAuthentication authentication = jwtTokenValidator.validateToken(jwtToken);
+                    if (authentication != null) {
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                        log.info("JWT token validation successful for user on public path: {}", authentication.getPrincipal().getName());
+                    }
+                } catch (Exception e) {
+                    log.warn("Invalid token on public path. Proceeding without authentication. Error: {}", e.getMessage());
+                }
+            }
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
             String jwtToken = jwtTokenValidator.getToken(request);
 
             if (jwtToken == null) {
-                if (isPublicPath(request.getRequestURI())) {
-                    filterChain.doFilter(request, response);
-                } else {
-                    log.warn("Authentication token is required for: {}", request.getRequestURI());
-                    setErrorResponse(response, HttpStatus.FORBIDDEN, "Authentication token is required");
-                }
+                log.warn("Authentication token is required for: {}", request.getRequestURI());
+                setErrorResponse(response, HttpStatus.FORBIDDEN, "Authentication token is required");
                 return;
             }
 
@@ -62,7 +75,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.info("JWT token validation successful for user: {}", authentication.getPrincipal().getName());
                 filterChain.doFilter(request, response);
             } else {
-                log.warn("Invalid JWT token provided.");
+                log.warn("Invalid JWT token provided for protected path.");
                 setErrorResponse(response, HttpStatus.FORBIDDEN, "Invalid authentication token");
             }
 
