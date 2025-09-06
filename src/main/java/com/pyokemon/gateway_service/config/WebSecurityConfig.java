@@ -3,6 +3,7 @@ package com.pyokemon.gateway_service.config;
 
 import com.pyokemon.gateway_service.common.constant.ApiPermitConstants;
 import com.pyokemon.gateway_service.security.filter.JwtAuthenticationFilter;
+import com.pyokemon.gateway_service.security.handler.CustomAccessDeniedHandler;
 import com.pyokemon.gateway_service.security.jwt.JwtTokenValidator;
 import com.pyokemon.gateway_service.common.constant.ApiPermitConstants.*;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +57,8 @@ public class WebSecurityConfig {
                         .requestMatchers(GatewayApi.PERMIT_ALL).permitAll()
                         // 나머지 요청은 인증 필요
                         .anyRequest().authenticated()
-                );
+                )
+                .exceptionHandling(exceptionHandling -> exceptionHandling.accessDeniedHandler(new CustomAccessDeniedHandler()));
         return http.build();
     }
 
