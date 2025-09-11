@@ -33,12 +33,12 @@
     <OpenTelemetryLog4j2Appender name="OpenTelemetry"/>
     </Appenders>
     <Loggers>
-    <Root level="INFO">
+    <Root level="DEBUG">
         <AppenderRef ref="Console"/>
         <AppenderRef ref="JsonFile" level="DEBUG"/>
         <AppenderRef ref="OpenTelemetry" level="DEBUG"/>
     </Root>
     <Logger name="com.pyokemon" level="DEBUG"/>
-    <Logger name="org.springframework" level="INFO"/>
+    <Logger name="org.springframework" level="DEBUG"/>
     </Loggers>
 </Configuration> 
